@@ -99,15 +99,26 @@ def ensure_data_files() -> None:
 def load_json_list(path: Path) -> list[dict]:
     ensure_data_files()
 
-    with path.open("r", encoding="utf-8") as file:
-        return json.load(file)
+    try:
+        with path.open("r", encoding="utf-8") as file:
+            return json.load(file)
+    except json.JSONDecodeError:
+        st.error(
+            f"Le fichier {path.name} est illisible ou corrompu. "
+            f"Restaurez une sauvegarde depuis 03_App/backups/."
+        )
+        st.stop()
 
 
 def save_json_list(path: Path, data: list[dict]) -> None:
     ensure_data_files()
 
-    with path.open("w", encoding="utf-8") as file:
+    temp_path = path.with_name(path.name + ".tmp")
+
+    with temp_path.open("w", encoding="utf-8") as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
+
+    temp_path.replace(path)
 
 
 def load_careers() -> list[dict]:
