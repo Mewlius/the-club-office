@@ -329,23 +329,49 @@ def to_numeric_series(df: pd.DataFrame, column: str) -> pd.Series:
     return pd.to_numeric(df[column], errors="coerce").fillna(0)
 
 
+def get_season_memory_key(career_id: str) -> str:
+    # One remembered season per career, so two careers never get mixed up.
+    return f"selected_season_{career_id}"
+
+
+def remember_season(career_id: str, season_label: str) -> None:
+    st.session_state[get_season_memory_key(career_id)] = season_label
+
+
+def select_season(career: dict, seasons: list[dict]) -> dict:
+    season_labels = {
+        season["season_label"]: season
+        for season in seasons
+    }
+    labels = list(season_labels.keys())
+
+    # Start on the season remembered from the previous page,
+    # or on the most recent season if nothing is remembered yet.
+    remembered_label = st.session_state.get(get_season_memory_key(career["career_id"]))
+
+    if remembered_label in labels:
+        default_index = labels.index(remembered_label)
+    else:
+        default_index = len(labels) - 1
+
+    selected_label = st.selectbox(
+        "Season",
+        options=labels,
+        index=default_index,
+    )
+
+    remember_season(career["career_id"], selected_label)
+
+    return season_labels[selected_label]
+
+
 def get_selected_season(career: dict) -> dict | None:
     seasons = get_seasons_for_career(career["career_id"])
 
     if not seasons:
         return None
 
-    season_labels = {
-        season["season_label"]: season
-        for season in seasons
-    }
-
-    selected_label = st.selectbox(
-        "Season",
-        options=list(season_labels.keys()),
-    )
-
-    return season_labels[selected_label]
+    return select_season(career, seasons)
 
 
 def get_top_row(
@@ -590,6 +616,7 @@ def render_add_season() -> None:
 
         seasons.append(new_season)
         save_seasons(seasons)
+        remember_season(career["career_id"], new_season["season_label"])
 
         st.success("Season added.")
         st.json(new_season)
@@ -613,17 +640,7 @@ def render_import_csv() -> None:
     st.title("Import CSV")
     st.subheader(career["career_name"])
 
-    season_labels = {
-        season["season_label"]: season
-        for season in career_seasons
-    }
-
-    selected_season_label = st.selectbox(
-        "Season",
-        options=list(season_labels.keys()),
-    )
-
-    selected_season = season_labels[selected_season_label]
+    selected_season = select_season(career, career_seasons)
 
     import_type = st.selectbox(
         "CSV type",
