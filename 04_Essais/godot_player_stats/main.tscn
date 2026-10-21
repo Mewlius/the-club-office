@@ -1,0 +1,236 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://main.gd" id="1_ig7tw"]
+
+[node name="Main" type="Control" unique_id=615998764]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_ig7tw")
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=666078962]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+
+[node name="HeaderBar" type="PanelContainer" parent="Layout" unique_id=801548278]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeaderBar"
+
+[node name="HeaderRow" type="HBoxContainer" parent="Layout/HeaderBar" unique_id=2070514138]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="CareerOption" type="OptionButton" parent="Layout/HeaderBar/HeaderRow" unique_id=787170979]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ClubOption"
+
+[node name="SeasonBox" type="VBoxContainer" parent="Layout/HeaderBar/HeaderRow" unique_id=923229378]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = -2
+
+[node name="SeasonCaption" type="Label" parent="Layout/HeaderBar/HeaderRow/SeasonBox" unique_id=1956728480]
+layout_mode = 2
+theme_type_variation = &"HeaderCaption"
+text = "Season"
+
+[node name="SeasonOption" type="OptionButton" parent="Layout/HeaderBar/HeaderRow/SeasonBox" unique_id=436541119]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SeasonOption"
+
+[node name="HeaderSpacer" type="Control" parent="Layout/HeaderBar/HeaderRow" unique_id=1101035013]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ExportNote" type="Label" parent="Layout/HeaderBar/HeaderRow" unique_id=255261617]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeaderNote"
+
+[node name="ReloadButton" type="Button" parent="Layout/HeaderBar/HeaderRow" unique_id=1680229806]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"HeaderButton"
+text = "Reload files"
+
+[node name="Page" type="MarginContainer" parent="Layout" unique_id=1954661241]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="PageColumn" type="VBoxContainer" parent="Layout/Page" unique_id=603093772]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleRow" type="HBoxContainer" parent="Layout/Page/PageColumn" unique_id=1501135924]
+layout_mode = 2
+
+[node name="PageTitle" type="Label" parent="Layout/Page/PageColumn/TitleRow" unique_id=514912109]
+layout_mode = 2
+theme_type_variation = &"PageTitle"
+text = "Player stats"
+
+[node name="TitleSpacer" type="Control" parent="Layout/Page/PageColumn/TitleRow" unique_id=106725971]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CompetitionBar" type="HBoxContainer" parent="Layout/Page/PageColumn/TitleRow" unique_id=1537134981]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = -1
+
+[node name="FiltersRow" type="HBoxContainer" parent="Layout/Page/PageColumn" unique_id=861170896]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PositionField" type="VBoxContainer" parent="Layout/Page/PageColumn/FiltersRow" unique_id=1927774605]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Caption" type="Label" parent="Layout/Page/PageColumn/FiltersRow/PositionField" unique_id=100136066]
+layout_mode = 2
+theme_type_variation = &"FieldLabel"
+text = "Position"
+
+[node name="PositionOption" type="OptionButton" parent="Layout/Page/PageColumn/FiltersRow/PositionField" unique_id=1175025254]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 34)
+layout_mode = 2
+
+[node name="RoleField" type="VBoxContainer" parent="Layout/Page/PageColumn/FiltersRow" unique_id=476941226]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Caption" type="Label" parent="Layout/Page/PageColumn/FiltersRow/RoleField" unique_id=2005522291]
+layout_mode = 2
+theme_type_variation = &"FieldLabel"
+text = "Squad role"
+
+[node name="RoleOption" type="OptionButton" parent="Layout/Page/PageColumn/FiltersRow/RoleField" unique_id=1264709279]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 34)
+layout_mode = 2
+
+[node name="NationField" type="VBoxContainer" parent="Layout/Page/PageColumn/FiltersRow" unique_id=1035039033]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Caption" type="Label" parent="Layout/Page/PageColumn/FiltersRow/NationField" unique_id=2142578849]
+layout_mode = 2
+theme_type_variation = &"FieldLabel"
+text = "Nationality"
+
+[node name="NationOption" type="OptionButton" parent="Layout/Page/PageColumn/FiltersRow/NationField" unique_id=1732116820]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 34)
+layout_mode = 2
+
+[node name="MinAppsField" type="VBoxContainer" parent="Layout/Page/PageColumn/FiltersRow" unique_id=1938546971]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Caption" type="Label" parent="Layout/Page/PageColumn/FiltersRow/MinAppsField" unique_id=2142532774]
+layout_mode = 2
+theme_type_variation = &"FieldLabel"
+text = "Min. appearances"
+
+[node name="MinApps" type="SpinBox" parent="Layout/Page/PageColumn/FiltersRow/MinAppsField" unique_id=476422886]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 34)
+layout_mode = 2
+max_value = 200.0
+
+[node name="SearchField" type="VBoxContainer" parent="Layout/Page/PageColumn/FiltersRow" unique_id=1250717212]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Caption" type="Label" parent="Layout/Page/PageColumn/FiltersRow/SearchField" unique_id=1789507744]
+layout_mode = 2
+theme_type_variation = &"FieldLabel"
+text = "Search"
+
+[node name="Search" type="LineEdit" parent="Layout/Page/PageColumn/FiltersRow/SearchField" unique_id=1812587198]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 34)
+layout_mode = 2
+placeholder_text = "Search a player"
+clear_button_enabled = true
+
+[node name="SummaryRule" type="HSeparator" parent="Layout/Page/PageColumn" unique_id=826133452]
+layout_mode = 2
+
+[node name="Summary" type="HBoxContainer" parent="Layout/Page/PageColumn" unique_id=270765763]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 28
+
+[node name="MainRow" type="HBoxContainer" parent="Layout/Page/PageColumn" unique_id=1934032258]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="Table" type="Tree" parent="Layout/Page/PageColumn/MainRow" unique_id=698943991]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SidePanel" type="PanelContainer" parent="Layout/Page/PageColumn/MainRow" unique_id=1501692508]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"Sheet"
+
+[node name="SideScroll" type="ScrollContainer" parent="Layout/Page/PageColumn/MainRow/SidePanel" unique_id=1130651795]
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="PanelContent" type="VBoxContainer" parent="Layout/Page/PageColumn/MainRow/SidePanel/SideScroll" unique_id=532454247]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="EmptyState" type="CenterContainer" parent="Layout" unique_id=1228389141]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EmptyBox" type="VBoxContainer" parent="Layout/EmptyState" unique_id=2028172110]
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EmptyTitle" type="Label" parent="Layout/EmptyState/EmptyBox" unique_id=735946579]
+layout_mode = 2
+theme_type_variation = &"PageTitle"
+text = "No exported career yet"
+
+[node name="EmptyText" type="Label" parent="Layout/EmptyState/EmptyBox" unique_id=1791570404]
+layout_mode = 2
+text = "The files written by tco_session.lua were not found in this folder:"
+
+[node name="EmptyPath" type="Label" parent="Layout/EmptyState/EmptyBox" unique_id=1350675008]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"EmptyPath"
+
+[node name="EmptyHint" type="Label" parent="Layout/EmptyState/EmptyBox" unique_id=428828211]
+layout_mode = 2
+text = "Run 02_Lua/tco_session.lua in FC 26 (F9, Lua Engine, Execute), then open this project again."
+autowrap_mode = 3
