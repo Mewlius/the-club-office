@@ -50,6 +50,16 @@ launch_app.bat
 
 This starts the Streamlit app in the browser.
 
+## Lua export scripts
+
+The CSV files come from Lua scripts run in the FC 26 Live Editor. They are in:
+
+```text
+02_Lua/
+```
+
+`tco_session.lua` exports the files automatically before and after every match, and once a week. See `02_Lua/README.md`.
+
 ## Local data
 
 The app stores local data in:
