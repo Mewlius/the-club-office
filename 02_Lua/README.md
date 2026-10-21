@@ -17,7 +17,7 @@ F9 → Lua Engine → open `tco_session.lua` → Execute.
 What it does:
 
 - finds the club you manage and the current season by itself (nothing to edit between seasons);
-- exports the four files right away, then again **after every match of your team**;
+- exports the four files right away, then again **before every match of your team** (and after the match when the game sends its end-of-match events);
 - shows a message with the club, the season and the folder, so you can check them.
 
 Running it again in the same session does not add a second listener: it just exports again, right away.
@@ -68,6 +68,7 @@ A new career is a new save, so it gets its own folder.
 | `SEASON_START_MONTH` | `7` | first month of a season |
 | `EXPORT_ROOT_OVERRIDE` | `nil` | use another export folder |
 | `BACKUP_COUNT` | `3` | previous versions kept per file |
+| `LOG_ALL_EVENTS` | `true` | diagnostic: write every game event to the log (set to `false` once the tests are done) |
 
 ### Known limits
 

@@ -12,7 +12,8 @@
 --   * Finds the club you manage and the current season by itself:
 --     nothing to edit between two seasons.
 --   * Exports the four CSV files of the app right away,
---     then again after every match of your team.
+--     then again before every match of your team (and after the
+--     match when the game sends its end-of-match events).
 --   * Writes them to:
 --       Documents\TheClubOffice\exports\<club> - <save id>\<season>\
 --     One folder per career (save) and per season: a career or a
@@ -59,9 +60,13 @@ local SETTINGS = {
     BACKUP_COUNT = 3,
 
     CSV_SEPARATOR = ";",
+
+    -- DIAGNOSTIC: write EVERY game event to the log (number, name, in-game date),
+    -- to learn which events the game really sends. Set to false once done.
+    LOG_ALL_EVENTS = true,
 }
 
-local SCRIPT_VERSION = "1.1"
+local SCRIPT_VERSION = "1.2"
 
 -- =========================================================
 -- LIVE EDITOR MODULES
@@ -78,7 +83,49 @@ require 'imports/other/helpers'
 local EVENTS = {
     USER_MATCH_COMPLETED = ENUM_CM_EVENT_MSG_USER_MATCH_COMPLETED or 7,
     POST_MATCH_REPORTS_DISPLAYED = ENUM_CM_EVENT_MSG_POST_MATCH_REPORTS_DISPLAYED or 39,
+
+    -- Event 37: seen in the game log, in the career menus, just before each
+    -- match. The Live Editor has two lists of event names that disagree from
+    -- number 36 (enums.lua: ABOUT_TO_ENTER_PREMATCH, consts.lua:
+    -- ABOUT_TO_LEAVE_PREMATCH), so the number is used, not a name.
+    BEFORE_MATCH = 37,
 }
+
+-- Names of every event in the Live Editor's two lists, for the full log.
+local ENUM_EVENT_NAMES = {}
+
+for key, value in pairs(_G) do
+    if type(key) == "string" and type(value) == "number" then
+        local name = string.match(key, "^ENUM_CM_EVENT_MSG_(.+)$")
+
+        if name then
+            ENUM_EVENT_NAMES[value] = name
+        end
+    end
+end
+
+local function describe_event(event_id)
+    local enum_name = ENUM_EVENT_NAMES[event_id]
+    local const_name = nil
+
+    if type(CONST_CM_EVENTS_NAMES) == "table" then
+        const_name = CONST_CM_EVENTS_NAMES[event_id]
+    end
+
+    if enum_name == nil and const_name == nil then
+        return "(no name)"
+    end
+
+    if const_name == nil or enum_name == const_name then
+        return tostring(enum_name)
+    end
+
+    if enum_name == nil then
+        return const_name
+    end
+
+    return enum_name .. " / or " .. const_name
+end
 
 -- Events that are only written to the log (no export), to learn
 -- when the game sends them.
@@ -114,6 +161,8 @@ local session = {
     export_root = nil,
     busy = false,
     match_pending = false,
+    last_event_id = nil,
+    last_event_repeats = 0,
 }
 
 -- =========================================================
@@ -2233,10 +2282,47 @@ end
 -- GAME EVENTS
 -- =========================================================
 
+local function game_date_text()
+    local ok, text = pcall(function()
+        local date = GetCurrentDate()
+        return string.format("%04d-%02d-%02d", math.floor(date.year), math.floor(date.month), math.floor(date.day))
+    end)
+
+    if ok then
+        return text
+    end
+
+    return "?"
+end
+
+-- DIAGNOSTIC (LOG_ALL_EVENTS): one line per event. The same event received
+-- several times in a row is written once, then "(repeated N more times)".
+local function log_every_event(event_id, where, in_career)
+    if event_id == session.last_event_id then
+        session.last_event_repeats = session.last_event_repeats + 1
+        return
+    end
+
+    if session.last_event_id ~= nil and session.last_event_repeats > 0 then
+        log(string.format("  (event %d repeated %d more times)", session.last_event_id, session.last_event_repeats))
+    end
+
+    session.last_event_id = event_id
+    session.last_event_repeats = 0
+
+    local details = where
+
+    if in_career then
+        details = details .. ", game date " .. game_date_text()
+    end
+
+    log(string.format("event %d %s (%s)", event_id, describe_event(event_id), details))
+end
+
 -- During a match the game is not "in career mode" for the Live Editor:
--- the club and the in-game date cannot be read. So the end of a match only
--- marks an export as pending, and the export runs on the first event
--- received back in the career menus.
+-- the club and the in-game date cannot be read. So these events only mark
+-- an export as pending, and the export runs on the first event received
+-- in the career menus.
 function session.on_event(event_id)
     if event_id == nil then
         return
@@ -2245,15 +2331,32 @@ function session.on_event(event_id)
     local in_career = IsInCM() and true or false
     local where = in_career and "in career menus" or "outside career menus"
 
+    if SETTINGS.LOG_ALL_EVENTS then
+        log_every_event(event_id, where, in_career)
+    end
+
     if event_id == EVENTS.USER_MATCH_COMPLETED then
-        log("event: USER_MATCH_COMPLETED (" .. where .. ")")
+        if not SETTINGS.LOG_ALL_EVENTS then
+            log("event: USER_MATCH_COMPLETED (" .. where .. ")")
+        end
+
         session.match_pending = "match completed"
     elseif event_id == EVENTS.POST_MATCH_REPORTS_DISPLAYED then
         -- Export once more after the post-match screens,
         -- in case the stats were not final yet at the end of the match.
-        log("event: POST_MATCH_REPORTS_DISPLAYED (" .. where .. ")")
+        if not SETTINGS.LOG_ALL_EVENTS then
+            log("event: POST_MATCH_REPORTS_DISPLAYED (" .. where .. ")")
+        end
+
         session.match_pending = "post-match reports"
-    elseif LOGGED_EVENTS[event_id] ~= nil then
+    elseif event_id == EVENTS.BEFORE_MATCH then
+        -- Just before a match: everything up to the previous match is final.
+        if not SETTINGS.LOG_ALL_EVENTS then
+            log("event: 37 before match (" .. where .. ")")
+        end
+
+        session.match_pending = "before match"
+    elseif not SETTINGS.LOG_ALL_EVENTS and LOGGED_EVENTS[event_id] ~= nil then
         log("event: " .. LOGGED_EVENTS[event_id] .. " (" .. where .. ")")
     end
 
@@ -2327,7 +2430,11 @@ local function build_launch_message(result, already_listening, listening)
     lines[#lines + 1] = ""
 
     if listening then
-        lines[#lines + 1] = "Next exports: after every match of your team."
+        lines[#lines + 1] = "Next exports: before every match of your team."
+    end
+
+    if SETTINGS.LOG_ALL_EVENTS then
+        lines[#lines + 1] = "Diagnostic: every game event is written to tco_session_log.txt."
     end
 
     lines[#lines + 1] = "Wrong season? See SEASON_LABEL_OVERRIDE at the top of the script."
