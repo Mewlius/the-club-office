@@ -17,7 +17,7 @@ F9 → Lua Engine → open `tco_session.lua` → Execute.
 What it does:
 
 - finds the club you manage and the current season by itself (nothing to edit between seasons);
-- exports the four files right away, then again **before every match of your team** (and after the match when the game sends its end-of-match events);
+- exports the four files right away, then again **before and after every match of your team**, and **once a week** as a safety net;
 - shows a message with the club, the season and the folder, so you can check them.
 
 Running it again in the same session does not add a second listener: it just exports again, right away.
@@ -40,6 +40,19 @@ Documents\TheClubOffice\exports\
 The career folder is named after the club and the start of the save identifier (Live Editor `GetSaveUID`), so two saves with the same club never share files. Accents and symbols in the club name become `_`. If the Live Editor has no save identifier, the club id is used instead.
 
 A career or a season never writes into the folder of another one.
+
+### When it exports
+
+The script reacts to the game's career events. Their numbers were checked in the game with the full event log, because the Live Editor's two lists of event names (`enums.lua` and `consts.lua`) disagree with each other and with FC 26 in places:
+
+| Event | When | Export |
+|---|---|---|
+| 37 | career menus, just before a match | yes |
+| 15 | a day passes (the game passes a day by itself right after a match) | yes, the first one after a match |
+| 16 | a week passes | yes, unless an export already ran that in-game day |
+| 7 | end of the club's match (never seen with a simulated match) | yes, if it ever comes |
+
+The log also notes a few events (save, simulation, season start and end, transfer windows) to check the end of a season.
 
 ### Season label
 
@@ -68,7 +81,7 @@ A new career is a new save, so it gets its own folder.
 | `SEASON_START_MONTH` | `7` | first month of a season |
 | `EXPORT_ROOT_OVERRIDE` | `nil` | use another export folder |
 | `BACKUP_COUNT` | `3` | previous versions kept per file |
-| `LOG_ALL_EVENTS` | `true` | diagnostic: write every game event to the log (set to `false` once the tests are done) |
+| `LOG_ALL_EVENTS` | `false` | diagnostic: `true` writes every game event to the log |
 
 ### Known limits
 

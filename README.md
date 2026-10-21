@@ -58,7 +58,7 @@ The CSV files come from Lua scripts run in the FC 26 Live Editor. They are in:
 02_Lua/
 ```
 
-`tco_session.lua` exports the files automatically before every match. See `02_Lua/README.md`.
+`tco_session.lua` exports the files automatically before and after every match, and once a week. See `02_Lua/README.md`.
 
 ## Local data
 
