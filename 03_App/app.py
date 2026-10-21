@@ -290,19 +290,31 @@ def validate_csv_context(df: pd.DataFrame, career: dict, season: dict) -> list[s
         csv_teamids = set(df["career_teamid"].dropna().astype(str).unique())
         expected_teamid = str(career["teamid"])
 
-        if expected_teamid not in csv_teamids:
-            errors.append(
-                f"career_teamid mismatch. Expected {expected_teamid}, found {sorted(csv_teamids)}"
-            )
+        if csv_teamids != {expected_teamid}:
+            if len(csv_teamids) > 1:
+                errors.append(
+                    f"career_teamid: the CSV contains several clubs {sorted(csv_teamids)}. "
+                    f"It must contain only {expected_teamid}."
+                )
+            else:
+                errors.append(
+                    f"career_teamid mismatch. Expected {expected_teamid}, found {sorted(csv_teamids)}"
+                )
 
     if "season" in df.columns:
         csv_seasons = set(df["season"].dropna().astype(str).unique())
         expected_season = str(season["season_label"])
 
-        if expected_season not in csv_seasons:
-            errors.append(
-                f"season mismatch. Expected {expected_season}, found {sorted(csv_seasons)}"
-            )
+        if csv_seasons != {expected_season}:
+            if len(csv_seasons) > 1:
+                errors.append(
+                    f"season: the CSV contains several seasons {sorted(csv_seasons)}. "
+                    f"It must contain only {expected_season}."
+                )
+            else:
+                errors.append(
+                    f"season mismatch. Expected {expected_season}, found {sorted(csv_seasons)}"
+                )
 
     return errors
 
