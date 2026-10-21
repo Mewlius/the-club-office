@@ -26,17 +26,20 @@ Running it again in the same session does not add a second listener: it just exp
 
 ```text
 Documents\TheClubOffice\exports\
-    tco_session_log.txt                      log of everything the script did
-    2026-2027\
-        TEAM_<id>_SEASON_PLAYER_STATS_2026-2027.csv
-        TEAM_<id>_SEASON_TRANSFERS_2026-2027.csv
-        TEAM_<id>_FIXTURES_2026-2027.csv
-        TEAM_<id>_LEAGUE_STANDINGS_2026-2027.csv
-        tco_state_TEAM_<id>.txt              what was exported last
-        previous\                            the 3 previous versions of each file
+    tco_session_log.txt                          log of everything the script did
+    AFC Wimbledon - 686228de\                    one folder per career (club - save id)
+        2025-2026\                               one folder per season
+            TEAM_<id>_SEASON_PLAYER_STATS_2025-2026.csv
+            TEAM_<id>_SEASON_TRANSFERS_2025-2026.csv
+            TEAM_<id>_FIXTURES_2025-2026.csv
+            TEAM_<id>_LEAGUE_STANDINGS_2025-2026.csv
+            tco_state_TEAM_<id>.txt              what was exported last
+            previous\                            the 3 previous versions of each file
 ```
 
-One folder per season: a season never writes into the folder of another season.
+The career folder is named after the club and the start of the save identifier (Live Editor `GetSaveUID`), so two saves with the same club never share files. Accents and symbols in the club name become `_`. If the Live Editor has no save identifier, the club id is used instead.
+
+A career or a season never writes into the folder of another one.
 
 ### Season label
 
@@ -55,7 +58,7 @@ Inside a season, the numbers only go up. If they suddenly collapse while the dat
 
 A small drop (for example after reloading an older save) is allowed.
 
-If you restart a new career with the same club and the same season, rename the old season folder first, otherwise the safety check will protect the old files.
+A new career is a new save, so it gets its own folder.
 
 ### Settings (top of the script)
 
@@ -68,7 +71,6 @@ If you restart a new career with the same club and the same season, rename the o
 
 ### Known limits
 
-- Two careers with the same club and the same season write to the same files.
 - A player who left the club during the season is no longer in the squad export (same as the manual script).
 
 ## Manual scripts `01_` to `04_`

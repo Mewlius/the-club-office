@@ -14,9 +14,9 @@
 --   * Exports the four CSV files of the app right away,
 --     then again after every match of your team.
 --   * Writes them to:
---       Documents\TheClubOffice\exports\<season>\
---     One folder per season: a season never writes into the
---     folder of another season.
+--       Documents\TheClubOffice\exports\<club> - <save id>\<season>\
+--     One folder per career (save) and per season: a career or a
+--     season never writes into the folder of another one.
 --   * Keeps the previous versions of each file in
 --       <season>\previous\
 --   * Safety check: refuses to overwrite a season with data that
@@ -61,7 +61,7 @@ local SETTINGS = {
     CSV_SEPARATOR = ";",
 }
 
-local SCRIPT_VERSION = "1.0"
+local SCRIPT_VERSION = "1.1"
 
 -- =========================================================
 -- LIVE EDITOR MODULES
@@ -405,6 +405,37 @@ end
 -- CONTEXT: club, season, in-game date
 -- =========================================================
 
+-- Identifier of the loaded save (Live Editor function GetSaveUID).
+-- nil when this Live Editor does not have it.
+local function get_save_uid()
+    if type(GetSaveUID) ~= "function" then
+        return nil
+    end
+
+    local ok, uid = pcall(GetSaveUID)
+
+    if ok and type(uid) == "string" and string.match(uid, "^%w+$") then
+        return uid
+    end
+
+    return nil
+end
+
+-- Keeps only simple characters, so the folder name works everywhere
+-- (accents and symbols become "_").
+local function safe_folder_name(text)
+    local name = string.gsub(tostring(text), "[^%w%-%. ]", "_")
+    name = string.gsub(name, "_+", "_")
+    name = string.gsub(name, "^[%s%.]+", "")
+    name = string.gsub(name, "[%s%.]+$", "")
+
+    if name == "" then
+        name = "Club"
+    end
+
+    return name
+end
+
 local function get_context()
     local team_id = tonumber(GetUserTeamID())
 
@@ -441,9 +472,22 @@ local function get_context()
         return nil, "SEASON_LABEL_OVERRIDE must look like 2026-2027 (found: " .. tostring(season) .. ")"
     end
 
+    local team_name = tostring(GetTeamName(team_id))
+    local save_uid = get_save_uid()
+
+    -- One folder per career: "<club> - <start of the save id>".
+    -- Two saves with the same club get two different folders.
+    local career_folder = safe_folder_name(team_name) .. " - " .. tostring(team_id)
+
+    if save_uid ~= nil then
+        career_folder = safe_folder_name(team_name) .. " - " .. string.sub(save_uid, 1, 8)
+    end
+
     return {
         team_id = team_id,
-        team_name = tostring(GetTeamName(team_id)),
+        team_name = team_name,
+        save_uid = save_uid,
+        career_folder = career_folder,
         season = season,
         date = date,
         game_date = string.format("%04d-%02d-%02d", year, month, day),
@@ -2015,7 +2059,7 @@ local function export_all(reason)
         return { ok = false, error = context_error }
     end
 
-    local season_dir = join_path(session.export_root, ctx.season)
+    local season_dir = join_path(session.export_root, ctx.career_folder, ctx.season)
 
     if not ensure_dir(season_dir) then
         return { ok = false, ctx = ctx, error = "could not create the folder " .. season_dir }
@@ -2138,7 +2182,7 @@ local function log_result(reason, result)
     local where = ""
 
     if ctx then
-        where = string.format(" | %s | club %d | game date %s", ctx.season, ctx.team_id, ctx.game_date)
+        where = string.format(" | %s | %s | club %d | game date %s", ctx.career_folder, ctx.season, ctx.team_id, ctx.game_date)
     end
 
     if result.blocked then
@@ -2232,6 +2276,9 @@ end
 
 local function build_launch_message(result, already_listening, listening)
     local lines = {}
+
+    lines[#lines + 1] = "The Club Office export - script version " .. SCRIPT_VERSION
+    lines[#lines + 1] = ""
 
     if already_listening then
         lines[#lines + 1] = "Automatic export was already ON (not added twice)."
