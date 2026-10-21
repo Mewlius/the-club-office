@@ -2189,25 +2189,34 @@ end
 -- GAME EVENTS
 -- =========================================================
 
+-- During a match the game is not "in career mode" for the Live Editor:
+-- the club and the in-game date cannot be read. So the end of a match only
+-- marks an export as pending, and the export runs on the first event
+-- received back in the career menus.
 function session.on_event(event_id)
-    if event_id == nil or not IsInCM() then
+    if event_id == nil then
         return
     end
 
+    local in_career = IsInCM() and true or false
+    local where = in_career and "in career menus" or "outside career menus"
+
     if event_id == EVENTS.USER_MATCH_COMPLETED then
-        log("event: USER_MATCH_COMPLETED")
-        session.match_pending = true
-        export_now("match completed")
+        log("event: USER_MATCH_COMPLETED (" .. where .. ")")
+        session.match_pending = "match completed"
     elseif event_id == EVENTS.POST_MATCH_REPORTS_DISPLAYED then
-        -- Second export once the post-match screens are shown,
+        -- Export once more after the post-match screens,
         -- in case the stats were not final yet at the end of the match.
-        if session.match_pending then
-            session.match_pending = false
-            log("event: POST_MATCH_REPORTS_DISPLAYED")
-            export_now("post-match reports")
-        end
+        log("event: POST_MATCH_REPORTS_DISPLAYED (" .. where .. ")")
+        session.match_pending = "post-match reports"
     elseif LOGGED_EVENTS[event_id] ~= nil then
-        log("event: " .. LOGGED_EVENTS[event_id])
+        log("event: " .. LOGGED_EVENTS[event_id] .. " (" .. where .. ")")
+    end
+
+    if session.match_pending and in_career then
+        local reason = session.match_pending
+        session.match_pending = false
+        export_now(reason)
     end
 end
 
