@@ -1,54 +1,45 @@
 # The Club Office
 
-The Club Office is a local Streamlit companion app for FC 26 career mode.
+The Club Office is a local companion app for FC 26 career mode, built with Python and NiceGUI.
 
-The app helps manage and review a football career save with local data, CSV imports, season dashboards, player statistics, fixtures, standings and transfers.
+It keeps the memory of a career from one season to the next: the game erases the season stats, the app keeps them.
+
+## How it works
+
+1. In FC 26, `02_Lua/tco_session.lua` exports the career data to `Documents\TheClubOffice\exports` (before and after every match, and once a week).
+2. The app copies these exports into its own data when it starts and when you click **Reload files**. Careers and seasons are found automatically: nothing to import, no team id to type.
 
 ## Current status
 
-This repository contains the first stable technical prototype of the app.
+The app is being rebuilt with NiceGUI (milestone V1). Available now:
 
-Current features:
-
-- create or open a career
-- add seasons to a career
-- import CSV files exported from FC 26 / Lua scripts
-- view a season dashboard
-- view player statistics
-- view fixtures
-- view league standings
-- view transfers
-
-## App location
-
-The main app is located in:
-
-```text
-03_App/
-```
-
-Main files:
-
-```text
-03_App/app.py
-03_App/launch_app.bat
-```
+- careers and seasons found automatically from the exports;
+- automatic copy, with a safety check: an export older than the app's copy is not copied (it can be used on purpose from the app);
+- overview of the seasons of a career and of their files.
 
 ## How to launch the app
 
-Open the folder:
+Double-click:
+
+```text
+03_App/launch_app.bat
+```
+
+The first time, it installs NiceGUI in `03_App/.venv` (internet needed). The app opens in the browser.
+
+## App files
 
 ```text
 03_App/
+    launch_app.bat      start the app
+    main.py             entry point
+    settings.py         paths and constants
+    sync.py             copy of the exports into the app's data
+    store.py            reading of the app's data
+    layout.py           header shared by every page
+    theme.py            colours and fonts
+    page_overview.py    Overview page
 ```
-
-Then double-click:
-
-```text
-launch_app.bat
-```
-
-This starts the Streamlit app in the browser.
 
 ## Lua export scripts
 
@@ -62,15 +53,15 @@ The CSV files come from Lua scripts run in the FC 26 Live Editor. They are in:
 
 ## Local data
 
-The app stores local data in:
+The app keeps its copy of the exports in:
 
 ```text
-03_App/data/
+03_App/data/careers/<club> - <save id>/<season>/
 ```
 
-This folder is intentionally ignored by Git and must not be committed to GitHub.
+Each season folder keeps the 3 previous versions of each file in `previous/`.
 
-The ignored local data includes career data, season data and imported CSV data converted to JSON.
+This folder is intentionally ignored by Git and must not be committed to GitHub.
 
 ## Files not committed to GitHub
 
@@ -79,6 +70,7 @@ These files and folders must stay local:
 ```text
 03_App/data/
 03_App/backups/
+.nicegui/
 .venv/
 *.csv
 __pycache__/
@@ -89,20 +81,11 @@ __pycache__/
 ## Basic workflow
 
 ```text
-1. Pull latest changes
-2. Work locally
-3. Test the app
-4. Commit when stable
-5. Push to GitHub
+1. Each change is made on its own branch, linked to an issue
+2. A pull request is opened
+3. The change is tested locally (GitHub Desktop: Pull, then launch_app.bat)
+4. The pull request is merged with Squash and merge
 ```
-
-For now:
-
-- no branches unless needed
-- no direct code editing from GitHub web
-- no local data committed
-- one feature or fix at a time
-- test after each meaningful change
 
 ## Roadmap
 
@@ -122,8 +105,6 @@ V8 - Export / Sharing
 
 ## Development notes
 
-The current app already includes career and season concepts through `career_id` and `season_id`.
+The app reads only the files written by `tco_session.lua`: there is no manual CSV import any more. The previous Streamlit app (`03_App/app.py`) was removed.
 
-CSV imports are attached to a selected career and season. The analysis pages use the selected season to display the relevant dashboard, player stats, fixtures, standings and transfers.
-
-The next development steps should focus on stabilising the app, improving the import workflow, fiabilising multi-season usage and progressively refactoring `app.py`.
+The next steps rebuild the pages one by one (player stats, dashboard, fixtures, standings, transfers), then career management and the visual identity per career.
