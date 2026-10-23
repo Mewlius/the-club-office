@@ -12,6 +12,7 @@ import theme
 # Pages shown in the header: (path, label). New pages are added here.
 PAGES = [
     ("/", "Overview"),
+    ("/player-stats", "Player stats"),
 ]
 
 
@@ -85,8 +86,8 @@ def reload_files() -> None:
 # ----------------------------------------------------------------------
 
 @contextmanager
-def frame(path: str):
-    """Header + page column. Yields (career, season)."""
+def frame(path: str, wide: bool = False):
+    """Header + page column. Yields (career, season). wide: for pages with a big table."""
     theme.apply()
     careers = store.list_careers()
     career = current_career()
@@ -123,7 +124,7 @@ def frame(path: str):
 
         ui.button("Reload files", icon="refresh", on_click=reload_files).props("flat dense no-caps color=white")
 
-    with ui.column().classes("page w-full gap-4"):
+    with ui.column().classes("page w-full gap-4" + (" wide" if wide else "")):
         if career is None:
             empty_state()
             yield None, None
