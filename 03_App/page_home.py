@@ -101,6 +101,8 @@ def leaders_panel(summary: dict) -> None:
                         if leader["player"]:
                             ui.label(leader["position"] or "").classes(f"pos pos-{leader['group']}")
                             ui.label(leader["player"])
+                            if leader.get("left"):
+                                ui.label("Left").classes("left-tag").tooltip("Left the club during the season")
                         else:
                             ui.label("Nobody yet").classes("home-note")
                     ui.label(leader["value"]).classes("value")

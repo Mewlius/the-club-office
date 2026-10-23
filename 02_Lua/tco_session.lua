@@ -21,6 +21,10 @@
 --       <season>\previous\
 --   * Safety check: refuses to overwrite a season with data that
 --     looks reset by the game (see check_season_progress below).
+--   * Players who leave the club during the season (sold, released,
+--     loaned out) keep their stats: their last exported rows are read
+--     back from the previous export of the season and kept in the
+--     player stats file, marked left_club=true.
 --   * Writes a log you can open with Notepad:
 --       Documents\TheClubOffice\exports\tco_session_log.txt
 --
@@ -30,8 +34,9 @@
 --   Read only: this script never changes anything in the game.
 --
 -- The CSV columns and calculations are exactly the ones of the
--- manual scripts 01_ to 04_ (same folder), so the app imports
--- these files as before.
+-- manual scripts 01_ to 04_ (same folder), plus one last column in
+-- the player stats file: left_club (true for a player who left the
+-- club during the season, false otherwise).
 --
 -- Only uses functions of the FC 26 Live Editor itself
 -- (lua\libs\v2\imports\...).
@@ -65,7 +70,7 @@ local SETTINGS = {
     LOG_ALL_EVENTS = false,
 }
 
-local SCRIPT_VERSION = "1.3"
+local SCRIPT_VERSION = "1.4"
 
 -- =========================================================
 -- LIVE EDITOR MODULES
@@ -438,6 +443,76 @@ end
 
 local function csv_header(columns)
     return table.concat(columns, SETTINGS.CSV_SEPARATOR)
+end
+
+-- Reads CSV text written by csv_line back into rows of values (the exact
+-- reverse of csv_escape): quoted values may contain the separator, doubled
+-- quotes and line breaks. Empty lines are skipped.
+local function parse_csv(text)
+    local separator = SETTINGS.CSV_SEPARATOR
+    local records = {}
+    local fields = {}
+    local field = {}
+    local in_quotes = false
+    local i = 1
+    local length = #text
+
+    local function end_field()
+        fields[#fields + 1] = table.concat(field)
+        field = {}
+    end
+
+    local function end_record()
+        end_field()
+
+        if #fields > 1 or fields[1] ~= "" then
+            records[#records + 1] = fields
+        end
+
+        fields = {}
+    end
+
+    while i <= length do
+        local char = string.sub(text, i, i)
+
+        if in_quotes then
+            if char == "\"" then
+                if string.sub(text, i + 1, i + 1) == "\"" then
+                    field[#field + 1] = "\""
+                    i = i + 1
+                else
+                    in_quotes = false
+                end
+            else
+                field[#field + 1] = char
+            end
+        elseif char == "\"" then
+            in_quotes = true
+        elseif char == separator then
+            end_field()
+        elseif char == "\r" or char == "\n" then
+            if char == "\r" and string.sub(text, i + 1, i + 1) == "\n" then
+                i = i + 1
+            end
+
+            end_record()
+        else
+            field[#field + 1] = char
+        end
+
+        i = i + 1
+    end
+
+    if #field > 0 or #fields > 0 then
+        end_record()
+    end
+
+    return records
+end
+
+-- TEAM_<id>_<FILE>_<season>.csv
+local function export_file_name(ctx, file)
+    return string.format("TEAM_%d_%s_%s.csv", ctx.team_id, file, ctx.season)
 end
 
 -- =========================================================
@@ -820,7 +895,8 @@ local PLAYER_STATS_COLUMNS = {
     "saves",
     "goals_conceded",
     "cleansheets",
-    "row_type"
+    "row_type",
+    "left_club"
 }
 
 local function create_empty_stats()
@@ -911,8 +987,73 @@ local function build_stats_row(player, competition, compobjid, stats, row_type)
         stats.saves,
         stats.goals_conceded,
         stats.clean_sheets,
-        row_type
+        row_type,
+        "false"
     }
+end
+
+-- Players who left the club during the season (sold, released, loaned out)
+-- are no longer listed with the club by the game. Their last exported rows
+-- are read back from the previous player stats file of the season and kept,
+-- marked left_club=true (a player back at the club only has his new rows).
+-- current_players: the players of the club now, by playerid.
+-- Returns the rows (values in the order of PLAYER_STATS_COLUMNS) and how
+-- many players they are.
+local function read_left_players(path, current_players)
+    local file = io.open(path, "rb")
+
+    if file == nil then
+        return {}, 0 -- first export of the season
+    end
+
+    local text = file:read("*a") or ""
+    file:close()
+
+    local records = parse_csv(text)
+
+    if #records == 0 then
+        return {}, 0
+    end
+
+    local index = {}
+
+    for position, name in ipairs(records[1]) do
+        index[name] = position
+    end
+
+    if index.playerid == nil then
+        -- Never drop players silently: the old file is kept as it is
+        error("the previous player stats file could not be read (no playerid column)", 0)
+    end
+
+    local rows = {}
+    local players = {}
+    local count = 0
+
+    for r = 2, #records do
+        local fields = records[r]
+        local playerid = tonumber(fields[index.playerid])
+
+        if playerid ~= nil and current_players[playerid] == nil then
+            local values = {}
+
+            for position, column in ipairs(PLAYER_STATS_COLUMNS) do
+                if index[column] then
+                    values[position] = fields[index[column]]
+                end
+            end
+
+            values[#PLAYER_STATS_COLUMNS] = "true"
+            rows[#rows + 1] = values
+
+            if not players[playerid] then
+                players[playerid] = true
+                count = count + 1
+            end
+        end
+    end
+
+    return rows, count
 end
 
 local function build_player_stats(ctx, shared)
@@ -1071,12 +1212,36 @@ local function build_player_stats(ctx, shared)
         total_appearances = total_appearances + player.total_stats.app
     end
 
+    -- Players who left the club during the season: their last exported rows.
+    -- They are not counted in total_appearances, so the safety check still
+    -- sees a season reset by the game (the current squad back to zero).
+    local left_count = 0
+
+    if ctx.season_dir then
+        local previous_path = join_path(ctx.season_dir, export_file_name(ctx, "SEASON_PLAYER_STATS"))
+        local left_rows
+
+        left_rows, left_count = read_left_players(previous_path, players)
+
+        for _, values in ipairs(left_rows) do
+            lines[#lines + 1] = csv_line(values, column_count)
+            rows_count = rows_count + 1
+        end
+    end
+
+    local summary = string.format("%d rows, %d players, %d appearances", rows_count, players_count, total_appearances)
+
+    if left_count > 0 then
+        summary = summary .. string.format(", %d left the club", left_count)
+    end
+
     return {
         lines = lines,
         rows = rows_count,
         players = players_count,
+        left_players = left_count,
         total_appearances = total_appearances,
-        summary = string.format("%d rows, %d players, %d appearances", rows_count, players_count, total_appearances),
+        summary = summary,
     }
 end
 
@@ -2104,6 +2269,9 @@ local function export_all(reason)
         return { ok = false, ctx = ctx, error = "could not create the folder " .. season_dir }
     end
 
+    -- The player stats read the previous export of the season from here
+    ctx.season_dir = season_dir
+
     local shared = make_shared()
     local built = {}
     local problems = {}
@@ -2116,7 +2284,7 @@ local function export_all(reason)
         elseif result == nil then
             problems[#problems + 1] = part.label .. ": not exported (" .. tostring(note) .. ")"
         else
-            result.file_name = string.format("TEAM_%d_%s_%s.csv", ctx.team_id, part.file, ctx.season)
+            result.file_name = export_file_name(ctx, part.file)
             built[part.key] = result
         end
     end

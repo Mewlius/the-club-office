@@ -258,8 +258,14 @@ def matches(rows: list[dict] | None) -> dict:
 # Players (player stats file)
 # ----------------------------------------------------------------------
 
+def left_club(row: dict) -> bool:
+    """A player who left the club during the season (kept by tco_session.lua 1.4).
+    Files without the left_club column only have the current squad."""
+    return row.get("left_club") == "true"
+
+
 def leaders(rows: list[dict] | None, club_matches: int) -> list[dict]:
-    """Best players of the season (all competitions)."""
+    """Best players of the season (all competitions), players who left the club included."""
     totals = [r for r in (rows or []) if r.get("row_type") == "TOTAL"]
     if not totals:
         return []
@@ -270,7 +276,8 @@ def leaders(rows: list[dict] | None, club_matches: int) -> list[dict]:
             return {"label": label, "player": None, "value": "-", "position": None}
         top = max(candidates, key=lambda r: (number(r.get(key)), number(r.get("appearances"))))
         return {"label": label, "player": top.get("playername"), "value": fmt(top.get(key)),
-                "position": top.get("position"), "group": football.position_group(top.get("position"))}
+                "position": top.get("position"), "group": football.position_group(top.get("position")),
+                "left": left_club(top)}
 
     # Average rating only counts players who played enough (a third of the club's matches, at least 3)
     minimum = max(3, round(club_matches / 3))
@@ -286,7 +293,8 @@ def leaders(rows: list[dict] | None, club_matches: int) -> list[dict]:
 
 
 def squad(rows: list[dict] | None, season: str) -> dict | None:
-    totals = [r for r in (rows or []) if r.get("row_type") == "TOTAL"]
+    """The current squad (players who left the club are not counted)."""
+    totals = [r for r in (rows or []) if r.get("row_type") == "TOTAL" and not left_club(r)]
     if not totals:
         return None
 

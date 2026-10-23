@@ -3,11 +3,14 @@ from nicegui import ui
 
 import football
 import layout
+import season_stats
 import store
 import theme
 
 ALL_COMPETITIONS = "All competitions"
 ALL = "All"
+# Players filter: the whole season, the current squad, or the players who left the club
+PLAYERS = {ALL: None, "Current": False, "Left": True}
 
 POSITION_SORT = f"(a, b) => {football.POSITION_ORDER}.indexOf(a) - {football.POSITION_ORDER}.indexOf(b)"
 
@@ -41,6 +44,7 @@ def load_rows(folder: str, season: str) -> list[dict]:
 
     for row in rows:
         row["pos_group"] = football.position_group(row.get("position"))
+        row["left"] = season_stats.left_club(row)
 
     return rows
 
@@ -92,6 +96,8 @@ def build_page(rows_all: list[dict]) -> None:
         ).classes("comp-toggle")
 
     with ui.row().classes("w-full items-end gap-3"):
+        players_filter = ui.select(list(PLAYERS), value=ALL, label="Players", on_change=lambda: refresh()) \
+            .props("outlined dense options-dense").classes("w-32")
         position_filter = ui.select([ALL], value=ALL, label="Position", on_change=lambda: refresh()) \
             .props("outlined dense options-dense").classes("w-36")
         role_filter = ui.select([ALL], value=ALL, label="Squad role", on_change=lambda: refresh()) \
@@ -118,6 +124,10 @@ def build_page(rows_all: list[dict]) -> None:
         table.add_slot("body-cell-position", r'''
             <q-td :props="props"><span :class="'pos pos-' + props.row.pos_group">{{ props.value }}</span></q-td>
         ''')
+        # A player who left the club: "Left" after his name (the row is greyed, see theme.py)
+        table.add_slot("body-cell-playername", r'''
+            <q-td :props="props">{{ props.value }}<span v-if="props.row.left" class="left-tag">Left</span></q-td>
+        ''')
         table.add_slot("body-cell-growth_gap", r'''
             <q-td :props="props"><span :class="props.value > 0 ? 'growth up' : 'growth'">{{ props.value > 0 ? '+' + props.value : props.value }}</span></q-td>
         ''')
@@ -136,6 +146,8 @@ def build_page(rows_all: list[dict]) -> None:
 
     def filtered_rows() -> list[dict]:
         rows = view_rows()
+        if PLAYERS.get(players_filter.value) is not None:
+            rows = [r for r in rows if r["left"] == PLAYERS[players_filter.value]]
         if position_filter.value not in (None, ALL):
             rows = [r for r in rows if r.get("position") == position_filter.value]
         if role_filter.value not in (None, ALL):
@@ -251,6 +263,10 @@ def build_page(rows_all: list[dict]) -> None:
                                 group = football.position_group(position)
                                 ui.label(position).classes(f"pos pos-{group}" + (" secondary" if index else ""))
                 ui.button(icon="close", on_click=show_overview).props("flat round dense").tooltip("Close")
+
+            if total["left"]:
+                ui.label("Left the club during the season: his stats with the club, "
+                         "as in the last export before he left.").classes("side-note left-note")
 
             growth = total.get("growth_gap")
             with ui.row().classes("gap-6"):

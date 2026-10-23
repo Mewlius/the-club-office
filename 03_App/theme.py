@@ -231,6 +231,13 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .squad-table .q-table--col-auto-width {{ display: none; }}
 .squad-table .player {{ font-weight: 600; }}
 
+/* Players who left the club during the season: "Left" tag, greyed row */
+.left-tag {{ display: inline-block; margin-left: 6px; padding: 0 6px; border: 1px solid var(--line); border-radius: 8px;
+            color: var(--muted); font-size: 11px; font-weight: 600; line-height: 16px; vertical-align: middle; }}
+.squad-table tbody tr:has(.left-tag) td {{ color: var(--muted); }}
+.squad-table tbody tr:has(.left-tag) .pos {{ opacity: 0.55; }}
+.left-note {{ font-style: italic; }}
+
 /* Position colour code (the squad sheet) */
 .pos {{
     display: inline-block; min-width: 40px; padding: 1px 6px; border-radius: 3px; text-align: center;

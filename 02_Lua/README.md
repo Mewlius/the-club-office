@@ -18,7 +18,8 @@ What it does:
 
 - finds the club you manage and the current season by itself (nothing to edit between seasons);
 - exports the four files right away, then again **before and after every match of your team**, and **once a week** as a safety net;
-- shows a message with the club, the season and the folder, so you can check them.
+- keeps the stats of the players who leave the club during the season (see below);
+- shows a message with the club, the season and the folder, so you can check them (and the script version: 1.4).
 
 Running it again in the same session does not add a second listener: it just exports again, right away.
 
@@ -83,9 +84,18 @@ A new career is a new save, so it gets its own folder.
 | `BACKUP_COUNT` | `3` | previous versions kept per file |
 | `LOG_ALL_EVENTS` | `false` | diagnostic: `true` writes every game event to the log |
 
+### Players who leave the club during the season
+
+The game only lists a player with his current club. When a player leaves (sold, released, loaned out), the script reads its previous player stats file of the season and keeps his rows as they were in the last export before he left, with `left_club` = `true` (the last column of the file; `false` for the current squad). As the script exports after every match, these rows hold his whole season with the club.
+
+- If he comes back to the club during the season, only his new rows are kept.
+- A new season starts with an empty folder: the players who left are not carried into it.
+- The safety check only counts the current squad, so a season reset by the game is still detected.
+
 ### Known limits
 
-- A player who left the club during the season is no longer in the squad export (same as the manual script).
+- The matches played while the script was not running are not exported until the next export. For a player who leaves the club before that, they are missing.
+- The manual script `01_` has no `left_club` column: the app reads its files as the current squad.
 
 ## Manual scripts `01_` to `04_`
 

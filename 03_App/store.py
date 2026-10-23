@@ -81,7 +81,8 @@ def read_state(season_dir: Path) -> dict:
 
 
 def season_progress(season_dir: Path) -> dict:
-    """How far the season is: matches played by the club, squad appearances."""
+    """How far the season is: matches played by the club, appearances of the
+    current squad (players who left the club are not counted)."""
     played = None
     appearances = None
 
@@ -96,7 +97,7 @@ def season_progress(season_dir: Path) -> dict:
         appearances = 0
 
         for row in read_csv_raw(stats):
-            if row.get("row_type") == "TOTAL":
+            if row.get("row_type") == "TOTAL" and row.get("left_club") != "true":
                 try:
                     appearances += int(float(row.get("appearances") or 0))
                 except ValueError:
