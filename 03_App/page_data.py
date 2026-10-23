@@ -1,4 +1,4 @@
-"""Overview: the seasons of the selected career and the state of their files."""
+"""Data files: the seasons of the selected career and the state of their copied files."""
 from nicegui import ui
 
 import layout
@@ -21,8 +21,8 @@ def force(folder: str, season: str) -> None:
     ui.navigate.reload()
 
 
-def warnings(careers: list[dict]) -> None:
-    """Seasons the last reading did not update, for every career."""
+def show_warnings(careers: list[dict]) -> None:
+    """Seasons the last reading did not update, for every career (also shown on Home)."""
     problems = [line for line in sync.last_report if line["status"] in ("protected", "error")]
 
     for line in problems:
@@ -41,21 +41,21 @@ def warnings(careers: list[dict]) -> None:
                 ui.label(line["reason"] or "")
 
 
-@ui.page("/")
-def overview() -> None:
-    with layout.frame("/") as (career, selected_season):
+@ui.page("/data")
+def data_files() -> None:
+    with layout.frame("/data") as (career, selected_season):
         if career is None:
             return
 
         careers = store.list_careers()
-        warnings(careers)
+        show_warnings(careers)
 
         details = [f"Team id {career.get('team_id')}"]
         if career.get("save_id"):
             details.append(f"save {career['save_id']}")
 
         with ui.column().classes("gap-0"):
-            ui.label("Seasons").classes("page-title")
+            ui.label("Data files").classes("page-title")
             ui.label(", ".join(details)).classes("page-note")
 
         last_status = {line["season"]: line["status"] for line in sync.last_report if line["folder"] == career["folder"]}

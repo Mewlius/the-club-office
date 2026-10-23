@@ -15,7 +15,9 @@ The app is being rebuilt with NiceGUI (milestone V1). Available now:
 
 - careers and seasons found automatically from the exports;
 - automatic copy, with a safety check: an export older than the app's copy is not copied (it can be used on purpose from the app);
-- overview of the seasons of a career and of their files.
+- Home: the season at a glance (league position, form, results and next matches, players of the season, squad, transfer window);
+- Player stats: the squad by competition, with filters, chart and player sheet;
+- Data files: the state of the copied files of each season.
 
 ## How to launch the app
 
@@ -38,7 +40,11 @@ The first time, it installs NiceGUI in `03_App/.venv` (internet needed). The app
     store.py            reading of the app's data
     layout.py           header shared by every page
     theme.py            colours and fonts
-    page_overview.py    Overview page
+    football.py         positions, squad roles, feet
+    season_stats.py     calculations shown on Home
+    page_home.py        Home page
+    page_player_stats.py  Player stats page
+    page_data.py        Data files page
 ```
 
 ## Lua export scripts

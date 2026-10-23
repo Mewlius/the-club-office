@@ -24,6 +24,9 @@ CSS = f"""
     --def: #2D6CB5;
     --mid: #2E8A57;
     --att: #C7432E;
+    --win: #1F7A4D;
+    --draw: #8A97A8;
+    --loss: #B23A2B;
 }}
 body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !important; }}
 .cond {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; }}
@@ -38,7 +41,8 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .nav-link {{ color: #C9D3E3; text-decoration: none; font-size: 15px; padding: 6px 2px; border-bottom: 2px solid transparent; }}
 .nav-link:hover {{ color: #fff; }}
 .nav-link.active {{ color: #fff; border-bottom-color: #fff; }}
-.sync-note {{ color: #C9D3E3; font-size: 13px; white-space: nowrap; }}
+.sync-note {{ color: #C9D3E3; font-size: 13px; white-space: nowrap; text-decoration: none; }}
+.sync-note:hover {{ color: #fff; text-decoration: underline; }}
 
 .page {{ padding: 22px 28px 32px; max-width: 1280px; margin: 0 auto; }}
 .page.wide {{ max-width: 1680px; }}
@@ -76,6 +80,52 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
     .season-row.head {{ display: none; }}
     .cell-caption {{ display: block; }}
 }}
+
+/* ---------- Home ---------- */
+
+.panel {{ background: var(--sheet); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }}
+.panel-title {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 20px; font-weight: 700; }}
+.panel-subtitle {{ font-size: 15px; font-weight: 600; margin-top: 4px; }}
+
+/* Season snapshot: the big numbers */
+.snapshot {{ display: grid; grid-template-columns: repeat(5, auto); justify-content: space-between; gap: 18px 28px; }}
+.stat .value {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 44px; font-weight: 700; line-height: 1; }}
+.stat .caption {{ color: var(--muted); font-size: 14px; margin-top: 6px; }}
+@media (max-width: 1100px) {{ .snapshot {{ grid-template-columns: repeat(3, auto); justify-content: start; }} }}
+@media (max-width: 640px) {{ .snapshot {{ grid-template-columns: repeat(2, auto); }} }}
+
+/* Results: W, D, L */
+.form {{ display: flex; gap: 6px; margin-top: 4px; }}
+.res {{ display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 4px;
+        color: #fff; font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 14px; font-weight: 700; }}
+.form .res {{ width: 38px; height: 38px; font-size: 20px; }}
+.res-W {{ background: var(--win); }} .res-D {{ background: var(--draw); }} .res-L {{ background: var(--loss); }}
+
+.home-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }}
+@media (max-width: 1100px) {{ .home-grid {{ grid-template-columns: minmax(0, 1fr); }} }}
+
+/* Matches */
+.match-row {{ display: grid; grid-template-columns: 52px 26px minmax(0, 1fr) auto; align-items: center; gap: 10px;
+              padding: 7px 0; border-top: 1px solid #EEF1F5; }}
+.match-row:first-of-type {{ border-top: none; }}
+.match-row .when {{ color: var(--muted); font-size: 13px; }}
+.match-row .who {{ font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.match-row .comp {{ color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.match-row .score {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 18px; font-weight: 700; text-align: right; }}
+.venue {{ color: var(--muted); font-weight: 400; }}
+
+/* Leaders */
+.leader-row {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 8px 0; border-top: 1px solid #EEF1F5; }}
+.leader-row:first-of-type {{ border-top: none; }}
+.leader-row .what {{ grid-column: 1 / -1; color: var(--muted); font-size: 12px; }}
+.leader-row .who {{ display: flex; align-items: center; gap: 8px; font-weight: 600; min-width: 0; }}
+.leader-row .who span:last-child {{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.leader-row .value {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 22px; font-weight: 700; }}
+
+.names {{ color: var(--muted); font-size: 13px; }}
+.money-out {{ color: var(--loss); }} .money-in {{ color: var(--turf); }}
+.home-note {{ color: var(--muted); font-size: 13px; }}
+.home-note a {{ color: var(--ink); }}
 
 /* ---------- Player stats ---------- */
 
