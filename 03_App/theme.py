@@ -72,6 +72,23 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .status {{ font-size: 13px; color: var(--muted); }}
 .status.new, .status.updated {{ color: var(--turf); font-weight: 600; }}
 .status.protected, .status.error {{ color: var(--warn); font-weight: 600; }}
+/* Careers */
+.career-row {{ display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 110px 80px 160px 210px;
+               align-items: center; gap: 12px; padding: 10px 18px; border-top: 1px solid #EEF1F5; }}
+.career-row.head {{ border-top: none; color: var(--muted); font-size: 13px; padding-top: 10px; padding-bottom: 8px; }}
+.career-row.selected {{ background: #E6F0EA; }}
+.career-name {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 20px; font-weight: 700;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.career-cell {{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.dialog-card {{ width: 480px; max-width: 92vw; }}
+.dialog-card .path {{ background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 6px 10px;
+                      font-size: 13px; word-break: break-all; }}
+.manage-link {{ margin-bottom: 4px; }}
+@media (max-width: 900px) {{
+    .career-row {{ grid-template-columns: minmax(0, 1fr) auto; }}
+    .career-row.head {{ display: none; }}
+    .career-row .career-cell {{ display: none; }}
+}}
 @media (max-width: 900px) {{
     .tco-header {{ padding: 8px 16px; }}
     .sync-note {{ display: none; }}

@@ -54,9 +54,11 @@ def data_files() -> None:
         if career.get("save_id"):
             details.append(f"save {career['save_id']}")
 
-        with ui.column().classes("gap-0"):
-            ui.label("Data files").classes("page-title")
-            ui.label(", ".join(details)).classes("page-note")
+        with ui.row().classes("w-full items-end justify-between"):
+            with ui.column().classes("gap-0"):
+                ui.label("Data files").classes("page-title")
+                ui.label(", ".join(details)).classes("page-note")
+            ui.link("Manage careers", "/careers").classes("home-note manage-link")
 
         last_status = {line["season"]: line["status"] for line in sync.last_report if line["folder"] == career["folder"]}
 
