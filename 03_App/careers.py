@@ -1,9 +1,10 @@
 """Career management (Careers page): rename a career, delete it.
 
-Deleting never erases anything: the app's copy of the career and its export
-folder are moved together to Documents/TheClubOffice/deleted/, in a dated
-folder, so they can be moved back. Without its export folder, the career is
-not created again by the next reading of the exports.
+Deleting never erases anything: the app's copy of the career, its export
+folder and its identity (logo, banner, colours) are moved together to
+Documents/TheClubOffice/deleted/, in a dated folder, so they can be moved
+back. Without its export folder, the career is not created again by the next
+reading of the exports.
 """
 import shutil
 from datetime import datetime
@@ -20,6 +21,7 @@ RESTORE_NOTE = """This career was deleted from The Club Office on {when}.
 To get it back, close the app, then move:
 - the folder "app data" back to {app_dir}
 - the folder "exports" back to {export_dir}
+- the folder "identity" (logo, banner, colours), if there is one, back to {identity_dir}
 Then start the app again.
 """
 
@@ -51,15 +53,16 @@ def rename_career(folder: str, name: str) -> dict:
 
 
 def delete_career(folder: str) -> Path:
-    """Moves the app's copy of the career and its export folder to the deleted
-    folder. Returns the dated folder they were moved to.
+    """Moves the app's copy of the career, its export folder and its identity to
+    the deleted folder. Returns the dated folder they were moved to.
 
     The export folder goes first: if it cannot be moved (a file open in another
-    program), nothing has changed. If the app's copy then cannot be moved, the
-    career is still in the app and the deletion can be tried again."""
+    program), nothing has changed. The app's copy goes last: if something cannot
+    be moved, the career is still in the app and the deletion can be tried again."""
     _check_folder(folder)
     app_dir = store.career_dir(folder)
     export_dir = settings.exports_root() / folder
+    identity_dir = settings.careers_assets_dir() / folder
 
     if not app_dir.is_dir() and not export_dir.is_dir():
         raise ValueError(f"no career in {folder!r}")
@@ -74,11 +77,15 @@ def delete_career(folder: str) -> Path:
 
     target.mkdir(parents=True)
     (target / "README.txt").write_text(
-        RESTORE_NOTE.format(when=f"{when:%d %B %Y at %H:%M}", app_dir=app_dir, export_dir=export_dir),
+        RESTORE_NOTE.format(when=f"{when:%d %B %Y at %H:%M}", app_dir=app_dir, export_dir=export_dir,
+                            identity_dir=identity_dir),
         encoding="utf-8")
 
     if export_dir.is_dir():
         shutil.move(str(export_dir), str(target / "exports"))
+
+    if identity_dir.is_dir():
+        shutil.move(str(identity_dir), str(target / "identity"))
 
     if app_dir.is_dir():
         shutil.move(str(app_dir), str(target / "app data"))

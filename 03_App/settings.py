@@ -26,6 +26,18 @@ FILE_LABELS = {
 # Previous versions of each file kept in the app's copy (<season>/previous/).
 BACKUP_COUNT = 3
 
+# Logos, banners and colours: assets/careers/<career>/ (theme.json, never on
+# GitHub) and the app's own logo in assets/app/ (used when a career has none).
+ASSETS_DIR = Path(os.environ.get("TCO_ASSETS", APP_DIR / "assets"))
+
+
+def careers_assets_dir() -> Path:
+    return ASSETS_DIR / "careers"
+
+
+def app_assets_dir() -> Path:
+    return ASSETS_DIR / "app"
+
 
 def exports_root() -> Path:
     """Documents/TheClubOffice/exports, found the same way as tco_session.lua."""

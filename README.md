@@ -22,7 +22,7 @@ The app is being rebuilt with NiceGUI (milestone V1). Available now:
 - Transfers: the arrivals and departures of the season (all, summer or winter window), fees, net spend, biggest signing and sale;
 - History: the career season by season, and the all-time records (players and club), for all competitions or one;
 - Data files: the state of the copied files of each season;
-- Careers (from Data files): rename a career, or delete the career of a save you no longer use (moved to `Documents\TheClubOffice\deleted`, nothing is erased).
+- Careers (from Data files): rename a career, give it an identity (logo, banner, main and second colour), or delete the career of a save you no longer use (moved to `Documents\TheClubOffice\deleted`, nothing is erased).
 
 ## How to launch the app
 
@@ -43,6 +43,7 @@ The first time, it installs NiceGUI in `03_App/.venv` (internet needed). The app
     settings.py         paths and constants
     sync.py             copy of the exports into the app's data
     careers.py          rename and delete a career
+    identity.py         logo, banner and colours of a career (theme.json)
     store.py            reading of the app's data
     layout.py           header shared by every page
     theme.py            colours and fonts
@@ -81,7 +82,20 @@ Each season folder keeps the 3 previous versions of each file in `previous/`.
 
 This folder is intentionally ignored by Git and must not be committed to GitHub.
 
-A career deleted on the Careers page is not erased: its copy in the app and its export folder are moved together to `Documents\TheClubOffice\deleted\<club> - <save id> (deleted <date>)\`, with a `README.txt` that explains how to move them back.
+A career deleted on the Careers page is not erased: its copy in the app, its export folder and its identity are moved together to `Documents\TheClubOffice\deleted\<club> - <save id> (deleted <date>)\`, with a `README.txt` that explains how to move them back.
+
+## Career identity
+
+On the Careers page, the button **Identity** gives a career a logo, a banner and two colours. Everything is optional: a career without them keeps the default look.
+
+- **Logo** (PNG, JPG or WEBP): in the header and on Home.
+- **Banner**: behind the header, darkened so that the text stays readable.
+- **Main colour**: the header, and a very pale version for the page background.
+- **Second colour**: the highlights (menu, your club's row, chosen buttons) and the big figures.
+
+Any colour can be chosen (or a shortcut): the app adjusts it so that the text stays readable. The choices are kept in `03_App/assets/careers/<career>/theme.json`, with the images. This folder is never committed to GitHub.
+
+The logo of the app itself can be put in `03_App/assets/app/logo.png`: it is shown for every career without a logo of its own.
 
 ## Files not committed to GitHub
 
@@ -90,6 +104,7 @@ These files and folders must stay local:
 ```text
 03_App/data/
 03_App/backups/
+03_App/assets/careers/
 .nicegui/
 .venv/
 *.csv
@@ -127,4 +142,4 @@ V8 - Export / Sharing
 
 The app reads only the files written by `tco_session.lua`: there is no manual CSV import any more. The previous Streamlit app (`03_App/app.py`) was removed.
 
-The next steps: the visual identity per career (#20), then the closing checklist of V1 (#12).
+The next steps: the closing checklist of V1 (#12).
