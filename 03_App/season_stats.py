@@ -180,6 +180,16 @@ def table_position(table: list[dict], team_id) -> dict | None:
 # Matches (fixtures file)
 # ----------------------------------------------------------------------
 
+# The game keeps 255 (an empty byte) when a match had no penalty shoot-out.
+# The files written before tco_session.lua 1.5 can hold it: it means nothing.
+NO_SHOOTOUT = 255
+
+
+def shootout_goals(value) -> int | None:
+    """Penalties scored in a shoot-out (None: nothing in the file, or 255)."""
+    return value if isinstance(value, int) and 0 <= value < NO_SHOOTOUT else None
+
+
 def _match(row: dict) -> dict:
     is_home = row.get("is_home") == "true"
     played = row.get("played") == "true"
@@ -189,8 +199,10 @@ def _match(row: dict) -> dict:
     goals_for = goals_against = None
     if played:
         score = f"{row.get('home_score')}-{row.get('away_score')}"
-        if row.get("home_penalties") not in (None, "") or row.get("away_penalties") not in (None, ""):
-            penalties = f"{row.get('home_penalties') or 0}-{row.get('away_penalties') or 0} pens"
+        home_pens = shootout_goals(row.get("home_penalties"))
+        away_pens = shootout_goals(row.get("away_penalties"))
+        if home_pens is not None or away_pens is not None:
+            penalties = f"{home_pens or 0}-{away_pens or 0} pens"
             score += f" ({penalties})"
         home_goals, away_goals = row.get("home_score"), row.get("away_score")
         if isinstance(home_goals, int) and isinstance(away_goals, int):
