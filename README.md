@@ -20,6 +20,7 @@ The app is being rebuilt with NiceGUI (milestone V1). Available now:
 - Standings: the league table (overall, home or away), with the club's position and the points gaps around it;
 - Player stats: the squad by competition, with filters, chart and player sheet. The players who left the club during the season keep their stats (marked Left, filter Players: All, Current or Left);
 - Transfers: the arrivals and departures of the season (all, summer or winter window), fees, net spend, biggest signing and sale;
+- History: the career season by season, and the all-time records (players and club), for all competitions or one;
 - Data files: the state of the copied files of each season.
 
 ## How to launch the app
@@ -45,11 +46,13 @@ The first time, it installs NiceGUI in `03_App/.venv` (internet needed). The app
     theme.py            colours and fonts
     football.py         positions, squad roles, feet
     season_stats.py     season calculations (Home, Matches, Standings, Transfers)
+    career_stats.py     career calculations, every season together (History)
     page_home.py        Home page
     page_matches.py     Matches page
     page_standings.py   Standings page
     page_player_stats.py  Player stats page
     page_transfers.py   Transfers page
+    page_history.py     History page
     page_data.py        Data files page
 ```
 
@@ -119,4 +122,4 @@ V8 - Export / Sharing
 
 The app reads only the files written by `tco_session.lua`: there is no manual CSV import any more. The previous Streamlit app (`03_App/app.py`) was removed.
 
-The next steps: a History page with the career season by season and the all-time records (#48), then career management and the visual identity per career (#20).
+The next steps: career management (rename, delete), then the visual identity per career (#20).

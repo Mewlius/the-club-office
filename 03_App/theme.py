@@ -197,6 +197,40 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .transfer-table .unknown {{ color: var(--muted); font-style: italic; }}
 .transfer-table .exchange {{ color: var(--muted); font-size: 12px; white-space: normal; }}
 .deal {{ display: flex; align-items: center; gap: 10px; }}
+
+/* ---------- History ---------- */
+
+.history-table {{ border: 1px solid var(--line); border-radius: 6px; background: var(--sheet); }}
+.history-table thead tr th {{
+    color: var(--muted); font-size: 13px; font-weight: 600; text-transform: none;
+    font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; border-bottom: 1px solid var(--line);
+}}
+.history-table tbody td {{ font-size: 14px; border-color: #EEF1F5; }}
+.history-table th, .history-table td {{ padding: 6px 10px !important; white-space: nowrap; }}
+.history-table tbody tr {{ cursor: pointer; }}
+.history-table tbody tr:hover td {{ background: #F6F8FB; }}
+.history-table .season-label {{ font-weight: 700; }}
+.history-table .count {{ color: var(--muted); }}
+.progress-tag {{ margin-left: 6px; padding: 0 6px; border: 1px solid #BFDCCB; border-radius: 8px; background: #EEF7F1;
+                 color: var(--turf); font-size: 11px; font-weight: 600; }}
+.records-head {{ margin-top: 12px; }}
+.club-records {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }}
+.record-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }}
+@media (max-width: 1100px) {{
+    .club-records {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+    .record-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+}}
+@media (max-width: 700px) {{ .club-records, .record-grid {{ grid-template-columns: minmax(0, 1fr); }} }}
+.record-card {{ min-width: 0; }}
+.record-main {{ font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.record-line {{ display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 8px;
+                padding: 6px 0; border-top: 1px solid #EEF1F5; }}
+.record-line:nth-child(2) {{ border-top: none; }}
+.record-line .rank {{ color: var(--muted); font-size: 13px; }}
+.record-line .who {{ display: flex; align-items: center; gap: 8px; min-width: 0; }}
+.record-line .name {{ font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.record-line .season-count {{ color: var(--muted); font-size: 12px; white-space: nowrap; }}
+.record-line .value {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 20px; font-weight: 700; }}
 .deal-player {{ font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
 
 /* ---------- Player stats ---------- */

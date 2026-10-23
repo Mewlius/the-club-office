@@ -16,6 +16,7 @@ PAGES = [
     ("/standings", "Standings"),
     ("/player-stats", "Player stats"),
     ("/transfers", "Transfers"),
+    ("/history", "History"),
 ]
 
 
@@ -51,11 +52,15 @@ def select_career(folder: str) -> None:
     ui.navigate.reload()
 
 
-def select_season(folder: str, season: str) -> None:
+def select_season(folder: str, season: str, go_to: str | None = None) -> None:
+    """Remembers the season, then reloads the page (or opens the page go_to)."""
     seasons = dict(app.storage.general.get("seasons", {}))
     seasons[folder] = season
     app.storage.general["seasons"] = seasons
-    ui.navigate.reload()
+    if go_to:
+        ui.navigate.to(go_to)
+    else:
+        ui.navigate.reload()
 
 
 # ----------------------------------------------------------------------
