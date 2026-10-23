@@ -70,7 +70,7 @@ local SETTINGS = {
     LOG_ALL_EVENTS = false,
 }
 
-local SCRIPT_VERSION = "1.4"
+local SCRIPT_VERSION = "1.5"
 
 -- =========================================================
 -- LIVE EDITOR MODULES
@@ -1894,6 +1894,20 @@ local function get_match_result(is_played, is_home, home_score, away_score)
     end
 end
 
+-- Penalties scored in a shoot-out, as written in the file. The game keeps
+-- 255 (an empty byte) when the match had no shoot-out: nothing is written
+-- then. 0 is not written either (the app shows 0 when the other team has a
+-- number).
+local NO_SHOOTOUT = 255
+
+local function shootout_goals(raw)
+    if raw ~= nil and raw > 0 and raw ~= NO_SHOOTOUT then
+        return raw
+    end
+
+    return ""
+end
+
 local function build_fixtures(ctx, shared)
     local memory = shared.fixture_memory()
     local fixtures = memory.fixtures
@@ -1933,17 +1947,8 @@ local function build_fixtures(ctx, shared)
             if played then
                 home_score = FixtureData["mHomeScore"]
                 away_score = FixtureData["mAwayScore"]
-
-                local raw_home_penalties = FixtureData["mHomePenalties"]
-                local raw_away_penalties = FixtureData["mAwayPenalties"]
-
-                if raw_home_penalties ~= nil and raw_home_penalties > 0 then
-                    home_penalties = raw_home_penalties
-                end
-
-                if raw_away_penalties ~= nil and raw_away_penalties > 0 then
-                    away_penalties = raw_away_penalties
-                end
+                home_penalties = shootout_goals(FixtureData["mHomePenalties"])
+                away_penalties = shootout_goals(FixtureData["mAwayPenalties"])
 
                 played_count = played_count + 1
             else

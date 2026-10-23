@@ -236,11 +236,12 @@ for i = 1, #fixtures do
             local raw_home_penalties = FixtureData["mHomePenalties"]
             local raw_away_penalties = FixtureData["mAwayPenalties"]
 
-            if raw_home_penalties ~= nil and raw_home_penalties > 0 then
+            -- 255 (an empty byte) = no penalty shoot-out in this match
+            if raw_home_penalties ~= nil and raw_home_penalties > 0 and raw_home_penalties ~= 255 then
                 home_penalties = raw_home_penalties
             end
 
-            if raw_away_penalties ~= nil and raw_away_penalties > 0 then
+            if raw_away_penalties ~= nil and raw_away_penalties > 0 and raw_away_penalties ~= 255 then
                 away_penalties = raw_away_penalties
             end
 

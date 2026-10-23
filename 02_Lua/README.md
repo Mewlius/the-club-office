@@ -19,7 +19,7 @@ What it does:
 - finds the club you manage and the current season by itself (nothing to edit between seasons);
 - exports the four files right away, then again **before and after every match of your team**, and **once a week** as a safety net;
 - keeps the stats of the players who leave the club during the season (see below);
-- shows a message with the club, the season and the folder, so you can check them (and the script version: 1.4).
+- shows a message with the club, the season and the folder, so you can check them (and the script version: 1.5).
 
 Running it again in the same session does not add a second listener: it just exports again, right away.
 
