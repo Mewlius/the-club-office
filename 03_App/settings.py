@@ -51,3 +51,8 @@ def exports_root() -> Path:
             return exports
 
     return candidates[0] / "TheClubOffice" / "exports"
+
+
+def deleted_root() -> Path:
+    """Documents/TheClubOffice/deleted: where deleted careers go (nothing is erased)."""
+    return exports_root().parent / "deleted"

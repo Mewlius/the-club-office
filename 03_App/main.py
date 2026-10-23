@@ -6,7 +6,8 @@ import os
 
 from nicegui import app, ui
 
-import page_data  # noqa: F401  (registers the pages)
+import page_careers  # noqa: F401  (registers the pages)
+import page_data  # noqa: F401
 import page_history  # noqa: F401
 import page_home  # noqa: F401
 import page_matches  # noqa: F401

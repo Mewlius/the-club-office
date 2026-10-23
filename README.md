@@ -21,7 +21,8 @@ The app is being rebuilt with NiceGUI (milestone V1). Available now:
 - Player stats: the squad by competition, with filters, chart and player sheet. The players who left the club during the season keep their stats (marked Left, filter Players: All, Current or Left);
 - Transfers: the arrivals and departures of the season (all, summer or winter window), fees, net spend, biggest signing and sale;
 - History: the career season by season, and the all-time records (players and club), for all competitions or one;
-- Data files: the state of the copied files of each season.
+- Data files: the state of the copied files of each season;
+- Careers (from Data files): rename a career, or delete the career of a save you no longer use (moved to `Documents\TheClubOffice\deleted`, nothing is erased).
 
 ## How to launch the app
 
@@ -41,6 +42,7 @@ The first time, it installs NiceGUI in `03_App/.venv` (internet needed). The app
     main.py             entry point
     settings.py         paths and constants
     sync.py             copy of the exports into the app's data
+    careers.py          rename and delete a career
     store.py            reading of the app's data
     layout.py           header shared by every page
     theme.py            colours and fonts
@@ -54,6 +56,7 @@ The first time, it installs NiceGUI in `03_App/.venv` (internet needed). The app
     page_transfers.py   Transfers page
     page_history.py     History page
     page_data.py        Data files page
+    page_careers.py     Careers page
 ```
 
 ## Lua export scripts
@@ -77,6 +80,8 @@ The app keeps its copy of the exports in:
 Each season folder keeps the 3 previous versions of each file in `previous/`.
 
 This folder is intentionally ignored by Git and must not be committed to GitHub.
+
+A career deleted on the Careers page is not erased: its copy in the app and its export folder are moved together to `Documents\TheClubOffice\deleted\<club> - <save id> (deleted <date>)\`, with a `README.txt` that explains how to move them back.
 
 ## Files not committed to GitHub
 
@@ -122,4 +127,4 @@ V8 - Export / Sharing
 
 The app reads only the files written by `tco_session.lua`: there is no manual CSV import any more. The previous Streamlit app (`03_App/app.py`) was removed.
 
-The next steps: career management (rename, delete), then the visual identity per career (#20).
+The next steps: the visual identity per career (#20), then the closing checklist of V1 (#12).

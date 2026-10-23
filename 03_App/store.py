@@ -144,17 +144,23 @@ def list_careers() -> list[dict]:
 
     careers = [read_career(p.name) for p in settings.DATA_DIR.iterdir() if p.is_dir()]
     careers = [c for c in careers if c]
-    return sorted(careers, key=lambda c: (c.get("club_name", "").lower(), c["folder"]))
+    return sorted(careers, key=lambda c: (career_name(c).lower(), c["folder"]))
+
+
+def career_name(career: dict) -> str:
+    """The name chosen on the Careers page, or the club name."""
+    return (career.get("display_name") or "").strip() or career.get("club_name") or career["folder"]
 
 
 def career_label(career: dict, careers: list[dict]) -> str:
-    """The club name, plus the save id when two careers share the club."""
-    same_club = [c for c in careers if c.get("club_name") == career.get("club_name")]
+    """The career name, plus the save id when two careers have the same name."""
+    name = career_name(career)
+    same_name = [c for c in careers if career_name(c) == name]
 
-    if len(same_club) > 1:
-        return f"{career.get('club_name')} ({career.get('save_id') or career['folder']})"
+    if len(same_name) > 1:
+        return f"{name} ({career.get('save_id') or career['folder']})"
 
-    return career.get("club_name") or career["folder"]
+    return name
 
 
 def list_seasons(folder: str) -> list[str]:
