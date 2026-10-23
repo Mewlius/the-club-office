@@ -93,6 +93,7 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .snapshot {{ display: grid; grid-template-columns: repeat(5, auto); justify-content: space-between; gap: 18px 28px; }}
 .stat .value {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 44px; font-weight: 700; line-height: 1; }}
 .stat .caption {{ color: var(--muted); font-size: 14px; margin-top: 6px; }}
+.stat a.value {{ display: block; }}
 @media (max-width: 1100px) {{ .snapshot {{ grid-template-columns: repeat(3, auto); justify-content: start; }} }}
 @media (max-width: 640px) {{ .snapshot {{ grid-template-columns: repeat(2, auto); }} }}
 
@@ -146,6 +147,35 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .rec-lines .current {{ font-weight: 700; }}
 .big-score {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 28px; font-weight: 700; min-width: 48px; }}
 .side-panel .opponent {{ font-weight: 600; }}
+
+/* ---------- Standings ---------- */
+
+.standings-table {{ border: 1px solid var(--line); border-radius: 6px; background: var(--sheet); }}
+.standings-table thead tr th {{
+    color: var(--muted); font-size: 13px; font-weight: 600; text-transform: none;
+    font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; border-bottom: 1px solid var(--line);
+}}
+.standings-table tbody td {{ font-size: 14px; border-color: #EEF1F5; }}
+.standings-table th, .standings-table td {{ padding: 6px 10px !important; white-space: nowrap; }}
+.standings-table tbody tr:hover td {{ background: #F6F8FB; }}
+.standings-table .team {{ font-weight: 600; }}
+.standings-table .pts {{ font-weight: 700; }}
+/* The club's row */
+.standings-table tbody td.mine {{ background: #E6F0EA; }}
+.standings-table tbody tr:hover td.mine {{ background: #DCEBE2; }}
+.standings-table tbody td.mine:first-child {{ box-shadow: inset 4px 0 0 var(--turf); }}
+.standings-table td.mine .team {{ color: var(--turf); }}
+
+.big-position {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 44px; font-weight: 700; line-height: 1; }}
+.gap-row {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 2px 10px;
+            padding: 8px 0; border-top: 1px solid #EEF1F5; }}
+.gap-row:first-of-type {{ border-top: none; }}
+.gap-row .what {{ grid-column: 1 / -1; color: var(--muted); font-size: 12px; }}
+.gap-row .who {{ display: flex; align-items: baseline; gap: 8px; min-width: 0; }}
+.gap-row .rank {{ color: var(--muted); font-size: 13px; }}
+.gap-row .name {{ font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.gap-row .gap-value {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 17px; font-weight: 700;
+                       white-space: nowrap; }}
 
 /* ---------- Player stats ---------- */
 

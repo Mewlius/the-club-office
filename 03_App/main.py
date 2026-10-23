@@ -10,6 +10,7 @@ import page_data  # noqa: F401  (registers the pages)
 import page_home  # noqa: F401
 import page_matches  # noqa: F401
 import page_player_stats  # noqa: F401
+import page_standings  # noqa: F401
 import sync
 
 # Copy the new exports every time the app starts
