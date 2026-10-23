@@ -2,7 +2,7 @@
 
 Pure calculations (no interface): they read the four files of a season and
 return plain dictionaries, so they can be tested and reused by other pages
-(Home, Matches, Standings).
+(Home, Matches, Standings, Transfers).
 """
 from datetime import date
 
@@ -55,6 +55,12 @@ def game_date(value) -> date | None:
 def short_date(value) -> str:
     parsed = game_date(value)
     return parsed.strftime("%d %b").lstrip("0") if parsed else ""
+
+
+def long_date(value) -> str:
+    """20260815 -> 15 Aug 2026 ("" when the date cannot be read)."""
+    parsed = game_date(value)
+    return f"{parsed.day} {parsed:%b %Y}" if parsed else ""
 
 
 def season_rows(folder: str, season: str, kind: str) -> list[dict] | None:
@@ -326,6 +332,56 @@ def transfers(rows: list[dict] | None) -> dict | None:
         "received": received,
         "net_spend": spent - received,
     }
+
+
+def transfer_window(value) -> str | None:
+    """Summer (July to December) or Winter (January to June), from the date of
+    the transfer. None when the date cannot be read."""
+    parsed = game_date(value)
+    if parsed is None:
+        return None
+    return "Summer" if parsed.month >= 7 else "Winter"
+
+
+def transfer_list(rows: list[dict] | None) -> list[dict]:
+    """Every transfer of the club, in date order (unknown dates last)."""
+    items = []
+    for row in rows or []:
+        arrival = row.get("direction") == "IN"
+        items.append({
+            "playerid": row.get("playerid"),
+            "player": row.get("playername") or "",
+            "position": row.get("position") or "",
+            "group": football.position_group(row.get("position")),
+            "age": row.get("age"),
+            "overall": row.get("overall"),
+            "potential": row.get("potential"),
+            "direction": row.get("direction"),
+            "loan": row.get("type") == "loan",
+            # The other club: where he came from, or where he went
+            "club": (row.get("teamfromname") if arrival else row.get("teamtoname")) or "",
+            "fee": number(row.get("fee")),
+            "deal_value": number(row.get("total_deal_value")),
+            "exchange": row.get("exchangeplayername") or "",
+            "date": row.get("date"),
+            "date_text": long_date(row.get("date")),
+            "window": transfer_window(row.get("date")),
+        })
+
+    def order(item):
+        parsed = game_date(item["date"])
+        return (parsed is None, parsed or date.min, item["player"].lower())
+
+    return sorted(items, key=order)
+
+
+def biggest_transfer(items: list[dict], direction: str) -> dict | None:
+    """Biggest signing ("IN") or sale ("OUT") by fee, then by total deal value.
+    Loans and deals without a fee are left out."""
+    candidates = [t for t in items if t["direction"] == direction and not t["loan"] and t["fee"] > 0]
+    if not candidates:
+        return None
+    return max(candidates, key=lambda t: (t["fee"], t["deal_value"]))
 
 
 # ----------------------------------------------------------------------

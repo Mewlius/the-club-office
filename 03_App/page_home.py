@@ -128,7 +128,7 @@ def squad_panel(summary: dict) -> None:
                 if ending:
                     ui.label(", ".join(ending)).classes("names")
 
-        ui.label("Transfer window").classes("panel-subtitle")
+        ui.link("Transfer window", "/transfers").classes("panel-subtitle title-link")
         if transfers is None:
             ui.label("No transfers exported yet for this season.").classes("home-note")
             return
