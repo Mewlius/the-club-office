@@ -4,6 +4,7 @@ from datetime import date
 
 from nicegui import app, ui
 
+import identity
 import settings
 import store
 import sync
@@ -96,12 +97,19 @@ def reload_files() -> None:
 @contextmanager
 def frame(path: str, wide: bool = False):
     """Header + page column. Yields (career, season). wide: for pages with a big table."""
-    theme.apply()
     careers = store.list_careers()
     career = current_career()
     season = current_season(career)
 
+    # The career's identity: colours, banner, logo (the default look without them)
+    colours = identity.colours(identity.load_theme(career["folder"]) if career else None)
+    colours["overlay"] = identity.header_overlay(colours["header"])
+    theme.apply(colours, identity.image_url(career["folder"], "banner") if career else None)
+    logo = identity.logo_url(career["folder"]) if career else identity.app_logo_url()
+
     with ui.header().classes("tco-header items-center no-wrap"):
+        if logo:
+            ui.image(logo).props("fit=contain no-spinner no-transition").classes("club-logo")
         if career:
             ui.select(
                 {c["folder"]: store.career_label(c, careers) for c in careers},

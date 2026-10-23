@@ -1,6 +1,7 @@
 """Home: the selected season at a glance."""
 from nicegui import ui
 
+import identity
 import layout
 import page_data
 import season_stats
@@ -163,7 +164,11 @@ def home() -> None:
             return
 
         summary = season_stats.season_summary(career, season)
-        ui.label(f"Season {season}").classes("page-title")
+        with ui.row().classes("items-center gap-3 no-wrap"):
+            logo = identity.logo_url(career["folder"])
+            if logo:
+                ui.image(logo).props("fit=contain no-spinner no-transition").classes("home-logo")
+            ui.label(f"Season {season}").classes("page-title")
         snapshot(summary)
 
         with ui.element("div").classes("home-grid w-full"):
