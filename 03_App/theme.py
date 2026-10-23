@@ -177,6 +177,28 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .gap-row .gap-value {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 17px; font-weight: 700;
                        white-space: nowrap; }}
 
+/* ---------- Transfers ---------- */
+
+.transfer-table {{ border: 1px solid var(--line); border-radius: 6px; background: var(--sheet); }}
+.transfer-table thead tr th {{
+    color: var(--muted); font-size: 13px; font-weight: 600; text-transform: none;
+    font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; border-bottom: 1px solid var(--line);
+}}
+.transfer-table tbody td {{ font-size: 14px; border-color: #EEF1F5; }}
+.transfer-table table {{ table-layout: fixed; }}
+.transfer-table th, .transfer-table td {{ padding: 5px 9px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+/* Sort arrow only on the sorted column: keeps the columns narrow */
+.transfer-table th .q-table__sort-icon {{ display: none; }}
+.transfer-table th.sorted .q-table__sort-icon {{ display: inline-flex; }}
+.transfer-table tbody tr:hover td {{ background: #F6F8FB; }}
+.transfer-table .player {{ font-weight: 600; }}
+.transfer-table .fee {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 16px; font-weight: 700; }}
+.transfer-table .loan {{ color: var(--muted); font-size: 13px; }}
+.transfer-table .unknown {{ color: var(--muted); font-style: italic; }}
+.transfer-table .exchange {{ color: var(--muted); font-size: 12px; white-space: normal; }}
+.deal {{ display: flex; align-items: center; gap: 10px; }}
+.deal-player {{ font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+
 /* ---------- Player stats ---------- */
 
 /* Competition switch */

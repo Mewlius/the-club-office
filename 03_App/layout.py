@@ -15,6 +15,7 @@ PAGES = [
     ("/matches", "Matches"),
     ("/standings", "Standings"),
     ("/player-stats", "Player stats"),
+    ("/transfers", "Transfers"),
 ]
 
 
