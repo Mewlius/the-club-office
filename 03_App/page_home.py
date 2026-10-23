@@ -72,17 +72,18 @@ def match_list(title: str, matches: list[dict], empty: str) -> None:
 def matches_panel(summary: dict) -> None:
     info = summary["matches"]
     with ui.column().classes("panel w-full gap-2"):
-        ui.label("Matches").classes("panel-title")
+        ui.link("Matches", "/matches").classes("panel-title title-link")
         if not summary["has"]["fixtures"]:
             ui.label("No fixtures exported yet for this season.").classes("home-note")
             return
         match_list("Last results", info["last"], "No match played yet.")
         match_list("Next matches", info["next"], "No match left this season.")
+        ui.link("All matches", "/matches").classes("home-note")
 
 
 def leaders_panel(summary: dict) -> None:
     with ui.column().classes("panel w-full gap-2"):
-        ui.label("Players of the season").classes("panel-title")
+        ui.link("Players of the season", "/player-stats").classes("panel-title title-link")
         if not summary["leaders"]:
             ui.label("No player stats exported yet for this season.").classes("home-note")
             return

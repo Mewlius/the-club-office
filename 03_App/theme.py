@@ -86,6 +86,8 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .panel {{ background: var(--sheet); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }}
 .panel-title {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 20px; font-weight: 700; }}
 .panel-subtitle {{ font-size: 15px; font-weight: 600; margin-top: 4px; }}
+.title-link {{ color: var(--ink); text-decoration: none; }}
+.title-link:hover {{ text-decoration: underline; }}
 
 /* Season snapshot: the big numbers */
 .snapshot {{ display: grid; grid-template-columns: repeat(5, auto); justify-content: space-between; gap: 18px 28px; }}
@@ -126,6 +128,24 @@ body {{ background: var(--paper); color: var(--ink); font-family: {FONT} !import
 .money-out {{ color: var(--loss); }} .money-in {{ color: var(--turf); }}
 .home-note {{ color: var(--muted); font-size: 13px; }}
 .home-note a {{ color: var(--ink); }}
+
+/* ---------- Matches ---------- */
+
+.match-table tbody tr {{ cursor: default; }}
+.match-table .upcoming {{ color: var(--muted); }}
+.match-table .opponent {{ font-weight: 600; }}
+.match-table .upcoming .opponent {{ font-weight: 400; }}
+.match-table .score-cell {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 16px; font-weight: 700; }}
+.pens {{ color: var(--muted); font-size: 12px; margin-left: 4px; }}
+.next-tag {{ font-size: 12px; font-weight: 600; color: var(--turf); border: 1px solid #BFDCCB; background: #EEF7F1;
+             border-radius: 10px; padding: 1px 8px; }}
+.rec-lines {{ display: grid; grid-template-columns: minmax(0, 1fr) repeat(6, 28px); gap: 3px 6px; font-size: 13px; }}
+.rec-lines .h {{ color: var(--muted); font-size: 12px; }}
+.rec-lines .n {{ text-align: right; }}
+.rec-lines .name {{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+.rec-lines .current {{ font-weight: 700; }}
+.big-score {{ font-family: {FONT_CONDENSED}; font-stretch: semi-condensed; font-size: 28px; font-weight: 700; min-width: 48px; }}
+.side-panel .opponent {{ font-weight: 600; }}
 
 /* ---------- Player stats ---------- */
 
