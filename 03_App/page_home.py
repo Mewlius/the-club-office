@@ -7,9 +7,14 @@ import season_stats
 import store
 
 
-def stat(value, caption: str) -> None:
+def stat(value, caption: str, link: str | None = None, tooltip: str = "") -> None:
     with ui.element("div").classes("stat"):
-        ui.label(str(value)).classes("value")
+        if link:
+            value_link = ui.link(str(value), link).classes("value title-link")
+            if tooltip:
+                value_link.tooltip(tooltip)
+        else:
+            ui.label(str(value)).classes("value")
         ui.label(caption).classes("caption")
 
 
@@ -32,7 +37,8 @@ def snapshot(summary: dict) -> None:
         with ui.element("div").classes("snapshot"):
             if league:
                 stat(season_stats.ordinal(league["position"]) if isinstance(league["position"], int) else "-",
-                     f"{league['competition']}, {league['teams']} teams")
+                     f"{league['competition']}, {league['teams']} teams",
+                     link="/standings", tooltip="See the standings")
                 stat(f"{league['points']:.0f}", f"points in {league['played']:.0f} matches")
                 stat(f"{league['wins']:.0f}-{league['draws']:.0f}-{league['losses']:.0f}", "won, drawn, lost")
                 gd = league["goal_difference"]

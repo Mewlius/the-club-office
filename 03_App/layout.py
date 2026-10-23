@@ -13,6 +13,7 @@ import theme
 PAGES = [
     ("/", "Home"),
     ("/matches", "Matches"),
+    ("/standings", "Standings"),
     ("/player-stats", "Player stats"),
 ]
 

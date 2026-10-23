@@ -1,7 +1,8 @@
-"""What the Home page shows about a season, computed from the app's copy.
+"""What the pages show about a season, computed from the app's copy.
 
 Pure calculations (no interface): they read the four files of a season and
-return plain dictionaries, so they can be tested and reused by other pages.
+return plain dictionaries, so they can be tested and reused by other pages
+(Home, Matches, Standings).
 """
 from datetime import date
 
@@ -84,6 +85,88 @@ def league(rows: list[dict] | None, team_id) -> dict | None:
         "goals_for": number(club.get("goals_for")),
         "goals_against": number(club.get("goals_against")),
         "goal_difference": number(club.get("goal_difference")),
+    }
+
+
+# ----------------------------------------------------------------------
+# League table (standings file)
+# ----------------------------------------------------------------------
+
+def standings(rows: list[dict] | None, side: str | None = None) -> list[dict]:
+    """The league table, first team first.
+
+    side None: the whole table, with the numbers and positions of the file.
+    side "home" or "away": only those matches, from the file's home_ and away_
+    columns. Points: 3 for a win, 1 for a draw. Teams level on points are
+    ordered by goal difference, then goals scored (like the export script
+    orders the whole table), then by name.
+    """
+    if not rows:
+        return []
+
+    if side is None:
+        table = [{
+            "teamid": row.get("teamid"),
+            "team": row.get("teamname") or "",
+            "position": row.get("position"),
+            "played": number(row.get("played")),
+            "wins": number(row.get("wins")),
+            "draws": number(row.get("draws")),
+            "losses": number(row.get("losses")),
+            "goals_for": number(row.get("goals_for")),
+            "goals_against": number(row.get("goals_against")),
+            "goal_difference": number(row.get("goal_difference")),
+            "points": number(row.get("points")),
+        } for row in rows]
+        return sorted(table, key=lambda line: line["position"] if isinstance(line["position"], int) else len(table) + 1)
+
+    prefix = side + "_"
+    table = []
+    for row in rows:
+        wins = number(row.get(prefix + "wins"))
+        draws = number(row.get(prefix + "draws"))
+        losses = number(row.get(prefix + "losses"))
+        goals_for = number(row.get(prefix + "goals_for"))
+        goals_against = number(row.get(prefix + "goals_against"))
+        table.append({
+            "teamid": row.get("teamid"),
+            "team": row.get("teamname") or "",
+            "played": wins + draws + losses,
+            "wins": wins,
+            "draws": draws,
+            "losses": losses,
+            "goals_for": goals_for,
+            "goals_against": goals_against,
+            "goal_difference": goals_for - goals_against,
+            "points": 3 * wins + draws,
+        })
+    table.sort(key=lambda line: (-line["points"], -line["goal_difference"], -line["goals_for"], line["team"].lower()))
+    for position, line in enumerate(table, start=1):
+        line["position"] = position
+    return table
+
+
+def table_position(table: list[dict], team_id) -> dict | None:
+    """Where the club is in a table, and its points gap ("gap") with the leader
+    and the teams just above and just below.
+
+    gap = club's points - other team's points (negative: behind).
+    No leader when the club leads, no "above" when the team above is the leader
+    (it is already the leader), no "below" when the club is last."""
+    index = next((i for i, line in enumerate(table) if line["teamid"] == team_id), None)
+    if index is None:
+        return None
+    club = table[index]
+
+    def with_gap(line: dict) -> dict:
+        return dict(line, gap=club["points"] - line["points"])
+
+    return {
+        "club": club,
+        "teams": len(table),
+        "leader": with_gap(table[0]) if index >= 1 else None,
+        "above": with_gap(table[index - 1]) if index >= 2 else None,
+        "below": with_gap(table[index + 1]) if index + 1 < len(table) else None,
     }
 
 
