@@ -11,7 +11,7 @@ import theme
 
 # Pages shown in the header: (path, label). New pages are added here.
 PAGES = [
-    ("/", "Overview"),
+    ("/", "Home"),
     ("/player-stats", "Player stats"),
 ]
 
@@ -72,7 +72,7 @@ def reload_files() -> None:
     protected = sum(1 for line in report if line["status"] in ("protected", "error"))
 
     if protected:
-        ui.notify(f"{protected} season(s) not updated: see Overview", type="warning", position="bottom-right")
+        ui.notify(f"{protected} season(s) not updated: see Home", type="warning", position="bottom-right")
     elif changed:
         ui.notify(f"{changed} season(s) updated", type="positive", position="bottom-right")
     else:
@@ -120,7 +120,8 @@ def frame(path: str, wide: bool = False):
         ui.space()
 
         if sync.last_run:
-            ui.label(f"Files read at {sync.last_run:%H:%M}").classes("sync-note")
+            ui.link(f"Files read at {sync.last_run:%H:%M}", "/data").classes("sync-note") \
+                .tooltip("See the data files of each season")
 
         ui.button("Reload files", icon="refresh", on_click=reload_files).props("flat dense no-caps color=white")
 

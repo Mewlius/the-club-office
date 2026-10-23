@@ -18,7 +18,11 @@ NUMERIC_COLUMNS = {
     "assists", "goal_contributions", "yellow_cards", "two_yellow", "red_cards", "saves",
     "goals_conceded", "cleansheets", "position", "home_teamid", "away_teamid", "fixtureid",
     "points", "wins", "draws", "losses", "goals_for", "goals_against", "goal_difference",
-    "fee", "total_deal_value",
+    "fee", "total_deal_value", "date", "time", "match_group_id", "home_score", "away_score",
+    "home_penalties", "away_penalties", "exchangeplayerid", "teamfromid", "teamtoid", "squad_role_id",
+    # "played" is a number in the standings ("true"/"false" in the fixtures stays text)
+    "played", "home_wins", "home_draws", "home_losses", "home_goals_for", "home_goals_against",
+    "away_wins", "away_draws", "away_losses", "away_goals_for", "away_goals_against",
 }
 DECIMAL_COLUMNS = {"AVG"}
 
