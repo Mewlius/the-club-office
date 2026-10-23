@@ -18,7 +18,7 @@ The app is being rebuilt with NiceGUI (milestone V1). Available now:
 - Home: the season at a glance (league position, form, results and next matches, players of the season, squad, transfer window);
 - Matches: fixtures and results by competition, with filters, record, home and away, biggest win and defeat;
 - Standings: the league table (overall, home or away), with the club's position and the points gaps around it;
-- Player stats: the squad by competition, with filters, chart and player sheet;
+- Player stats: the squad by competition, with filters, chart and player sheet. The players who left the club during the season keep their stats (marked Left, filter Players: All, Current or Left);
 - Transfers: the arrivals and departures of the season (all, summer or winter window), fees, net spend, biggest signing and sale;
 - Data files: the state of the copied files of each season.
 
@@ -61,7 +61,7 @@ The CSV files come from Lua scripts run in the FC 26 Live Editor. They are in:
 02_Lua/
 ```
 
-`tco_session.lua` exports the files automatically before and after every match, and once a week. See `02_Lua/README.md`.
+`tco_session.lua` exports the files automatically before and after every match, and once a week. Since version 1.4, it also keeps the stats of the players who leave the club during the season. See `02_Lua/README.md`.
 
 ## Local data
 
@@ -119,4 +119,4 @@ V8 - Export / Sharing
 
 The app reads only the files written by `tco_session.lua`: there is no manual CSV import any more. The previous Streamlit app (`03_App/app.py`) was removed.
 
-The next steps: keeping the stats of a player sold during the season (#42), a History page with the career season by season and the all-time records (#48), then career management and the visual identity per career (#20).
+The next steps: a History page with the career season by season and the all-time records (#48), then career management and the visual identity per career (#20).
