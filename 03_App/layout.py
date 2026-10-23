@@ -12,6 +12,7 @@ import theme
 # Pages shown in the header: (path, label). New pages are added here.
 PAGES = [
     ("/", "Home"),
+    ("/matches", "Matches"),
     ("/player-stats", "Player stats"),
 ]
 

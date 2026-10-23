@@ -56,7 +56,8 @@ def short_date(value) -> str:
     return parsed.strftime("%d %b").lstrip("0") if parsed else ""
 
 
-def _rows(folder: str, season: str, kind: str) -> list[dict] | None:
+def season_rows(folder: str, season: str, kind: str) -> list[dict] | None:
+    """The rows of one file of a season (None when it was not exported yet)."""
     path = store.find_file(store.career_dir(folder) / season, kind)
     return store.read_rows(path) if path else None
 
@@ -95,10 +96,16 @@ def _match(row: dict) -> dict:
     played = row.get("played") == "true"
     opponent = row.get("away_teamname") if is_home else row.get("home_teamname")
     score = ""
+    penalties = ""
+    goals_for = goals_against = None
     if played:
         score = f"{row.get('home_score')}-{row.get('away_score')}"
         if row.get("home_penalties") not in (None, "") or row.get("away_penalties") not in (None, ""):
-            score += f" ({row.get('home_penalties') or 0}-{row.get('away_penalties') or 0} pens)"
+            penalties = f"{row.get('home_penalties') or 0}-{row.get('away_penalties') or 0} pens"
+            score += f" ({penalties})"
+        home_goals, away_goals = row.get("home_score"), row.get("away_score")
+        if isinstance(home_goals, int) and isinstance(away_goals, int):
+            goals_for, goals_against = (home_goals, away_goals) if is_home else (away_goals, home_goals)
     return {
         "date": row.get("date"),
         "date_text": short_date(row.get("date")),
@@ -108,15 +115,46 @@ def _match(row: dict) -> dict:
         "played": played,
         "result": row.get("result") if played else "",
         "score": score,
+        "penalties": penalties,
+        "goals_for": goals_for,
+        "goals_against": goals_against,
         "order": (number(row.get("date")), number(row.get("time")), number(row.get("fixtureid"))),
     }
+
+
+def match_list(rows: list[dict] | None) -> list[dict]:
+    """Every match of the club, in date order."""
+    return sorted((_match(r) for r in rows or []), key=lambda m: m["order"])
+
+
+def record(match_items: list[dict]) -> dict:
+    """Played, won, drawn, lost, goals of a list of matches."""
+    played = [m for m in match_items if m["played"]]
+    return {
+        "played": len(played),
+        "wins": sum(1 for m in played if m["result"] == "W"),
+        "draws": sum(1 for m in played if m["result"] == "D"),
+        "losses": sum(1 for m in played if m["result"] == "L"),
+        "goals_for": sum(m["goals_for"] or 0 for m in played),
+        "goals_against": sum(m["goals_against"] or 0 for m in played),
+        "to_play": len(match_items) - len(played),
+    }
+
+
+def biggest(match_items: list[dict], result: str) -> dict | None:
+    """Biggest win ("W") or heaviest defeat ("L"): largest goal margin, then most goals."""
+    candidates = [m for m in match_items if m["played"] and m["result"] == result and m["goals_for"] is not None]
+    if not candidates:
+        return None
+    return max(candidates, key=lambda m: (abs(m["goals_for"] - m["goals_against"]),
+                                          m["goals_for"] if result == "W" else m["goals_against"]))
 
 
 def matches(rows: list[dict] | None) -> dict:
     """Last results (newest first), next matches (soonest first), form (oldest to newest)."""
     if not rows:
         return {"last": [], "next": [], "form": [], "played": 0}
-    all_matches = sorted((_match(r) for r in rows), key=lambda m: m["order"])
+    all_matches = match_list(rows)
     played = [m for m in all_matches if m["played"]]
     upcoming = [m for m in all_matches if not m["played"]]
     return {
@@ -213,15 +251,15 @@ def transfers(rows: list[dict] | None) -> dict | None:
 
 def season_summary(career: dict, season: str) -> dict:
     folder = career["folder"]
-    stats_rows = _rows(folder, season, "player_stats")
-    fixture_rows = _rows(folder, season, "fixtures")
+    stats_rows = season_rows(folder, season, "player_stats")
+    fixture_rows = season_rows(folder, season, "fixtures")
     match_info = matches(fixture_rows)
     return {
-        "league": league(_rows(folder, season, "standings"), career.get("team_id")),
+        "league": league(season_rows(folder, season, "standings"), career.get("team_id")),
         "matches": match_info,
         "leaders": leaders(stats_rows, match_info["played"]),
         "squad": squad(stats_rows, season),
-        "transfers": transfers(_rows(folder, season, "transfers")),
+        "transfers": transfers(season_rows(folder, season, "transfers")),
         "state": store.read_state(store.career_dir(folder) / season),
         "has": {
             "fixtures": fixture_rows is not None,
