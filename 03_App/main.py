@@ -6,7 +6,8 @@ import os
 
 from nicegui import app, ui
 
-import page_overview  # noqa: F401  (registers the page)
+import page_overview  # noqa: F401  (registers the pages)
+import page_player_stats  # noqa: F401
 import sync
 
 # Copy the new exports every time the app starts
